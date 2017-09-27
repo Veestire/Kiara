@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 
-class Meme:
+class Memes:
     """The stupid shit goes here."""
 
     def __init__(self, bot):
@@ -9,10 +9,10 @@ class Meme:
 
     @commands.command()
     async def petah(self, ctx, num: int = 10):
-        """Crash the server"""
+        """Reacts to messages with :petah:"""
         async for msg in ctx.history(limit=num):
             await msg.add_reaction('petah:316578038626385950')
 
 
 def setup(bot):
-    bot.add_cog(Meme(bot))
+    bot.add_cog(Memes(bot))
