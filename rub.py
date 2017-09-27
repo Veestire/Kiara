@@ -60,7 +60,7 @@ class Rub(commands.Bot):
 
     @commands.command()
     async def source(self, ctx):
-        await ctx.send('no')
+        await ctx.send('https://github.com/Nekorooni/Rub')
 
 
 if __name__ == '__main__':
