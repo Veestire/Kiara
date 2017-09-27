@@ -1,2 +1,2 @@
 # Rub
-Rub is a bot
+Rub rewrite
