@@ -10,11 +10,6 @@ from cogs.utils.helpformatter import RubHelpFormatter
 
 desc = 'A bot for rubs'
 
-cogs = [
-    'cogs.Admin',
-    'cogs.Memes'
-]
-
 class Rub(commands.Bot):
 
     def __init__(self):
@@ -24,7 +19,7 @@ class Rub(commands.Bot):
         self.add_command(self.source)
 
     def load_cogs(self):
-        for cog in cogs:
+        for cog in config.cogs:
             try:
                 self.load_extension(cog)
             except Exception as e:
@@ -43,9 +38,9 @@ class Rub(commands.Bot):
     async def on_command_error(self, ctx, error):
         # TODO: Add extra error handling
         if isinstance(error, commands.NoPrivateMessage):
-            await ctx.send('This command cannot be used in private messages.')
+            await ctx.send('This command is only for use inside guilds.')
         elif isinstance(error, commands.DisabledCommand):
-            await ctx.send('Sorry. This command is disabled and cannot be used.')
+            pass
         elif isinstance(error, commands.CommandInvokeError):
             print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
             traceback.print_tb(error.original.__traceback__)
@@ -60,6 +55,7 @@ class Rub(commands.Bot):
 
     @commands.command()
     async def source(self, ctx):
+        """A link to Rub's source code"""
         await ctx.send('https://github.com/Nekorooni/Rub')
 
 
