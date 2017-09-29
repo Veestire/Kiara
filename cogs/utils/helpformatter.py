@@ -4,7 +4,6 @@ import inspect
 import itertools
 from discord.ext.commands import HelpFormatter, Paginator, Command
 
-
 class RubHelpFormatter(HelpFormatter):
 
     def __init__(self):
@@ -37,7 +36,7 @@ class RubHelpFormatter(HelpFormatter):
         if isinstance(self.command, Command):
             # <signature portion>
             signature = self.get_command_signature()
-            self._paginator.add_line("t{signature}", empty=True)
+            self._paginator.add_line("{signature}", empty=True)
 
             # <long doc> section
             if self.command.help:
