@@ -74,7 +74,6 @@ class Cleverbot:
                 if msg.content:
                     await msg.channel.send(await self.sessions[msg.author.id].say(msg.content))
                 elif msg.attachments:
-                    print(msg.attachments[0].filename.split('.')[0])
                     await msg.channel.send(await self.sessions[msg.author.id].say(msg.attachments[0].filename.split('.')[0]))
 
     @commands.group()
