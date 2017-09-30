@@ -66,10 +66,16 @@ class Cleverbot:
         if msg.channel.id == 362669211966767104:
             if msg.mentions:
                 return
+            if msg.content.startswith('.'):
+                return
             if msg.author.id not in self.sessions:
                 self.sessions[msg.author.id] = CleverWrap(self.bot.config.cleverbot_token, name=msg.author.name)
             async with msg.channel.typing():
-                await msg.channel.send(await self.sessions[msg.author.id].say(msg.content))
+                if msg.content:
+                    await msg.channel.send(await self.sessions[msg.author.id].say(msg.content))
+                elif msg.attachments:
+                    print(msg.attachments[0].filename.split('.')[0])
+                    await msg.channel.send(await self.sessions[msg.author.id].say(msg.attachments[0].filename.split('.')[0]))
 
     @commands.group()
     async def cleverbot(self, ctx):
