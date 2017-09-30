@@ -4,6 +4,7 @@ import traceback
 
 import discord
 from discord.ext import commands
+import aiohttp
 
 import config
 from cogs.utils.helpformatter import RubHelpFormatter
@@ -17,6 +18,7 @@ class Rub(commands.Bot):
                          formatter=RubHelpFormatter())
         self.load_cogs()
         self.add_command(self.source)
+        self.session = aiohttp.ClientSession(loop=self.loop)
 
     def load_cogs(self):
         for cog in config.cogs:
