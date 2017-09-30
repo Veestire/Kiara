@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 class Manage:
@@ -40,6 +41,17 @@ class Manage:
                         await self.bot.user.edit(avatar=await resp.read())
             else:
                 await self.bot.user.edit(avatar=None)
+
+    @manage.command(hidden=True, aliases=['game'])
+    async def playing(self, ctx, *, game: discord.Game = None):
+        """Set Rub's game."""
+        await self.bot.change_presence(game=game)
+
+    @manage.command(hidden=True)
+    async def status(self, ctx, status = 'online'):
+        """Set Rub's status."""
+        await self.bot.change_presence(status=discord.Status[status])
+
 
 def setup(bot):
     bot.add_cog(Manage(bot))
