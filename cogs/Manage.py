@@ -52,6 +52,15 @@ class Manage:
         """Set Rub's status."""
         await self.bot.change_presence(status=discord.Status[status])
 
+    @manage.command(hidden=True)
+    async def stream(self, ctx, url=None, *, title=None):
+        """Set Rub's stream."""
+        if ctx.guild:
+            await self.bot.change_presence(game=discord.Game(name=title or ctx.guild.me.game.name or '\u200b', url=url, type=1))
+        else:
+            await self.bot.change_presence(game=discord.Game(name=title or '\u200b', url=url, type=1))
+        # TODO: Maybe a better way to handle no title
+
 
 def setup(bot):
     bot.add_cog(Manage(bot))
