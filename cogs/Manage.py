@@ -16,7 +16,7 @@ class Manage:
         if ctx.invoked_subcommand is None:
             raise commands.CommandInvokeError
 
-    @manage.command(hidden=True, aliases=['user'])
+    @manage.command(hidden=True, aliases=['user', 'name'])
     async def username(self, ctx, *, name):
         """Set Rub's username."""
         await self.bot.user.edit(username=name)
