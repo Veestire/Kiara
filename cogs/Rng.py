@@ -52,5 +52,9 @@ class Rng:
                   "Don't count on it","My reply is no","My sources say no","Outlook not so good","Very doubtful"]
         await ctx.send(random.choice(chance))
 
+    @commands.command(aliases=['pick', 'choice'])
+    async def choose(self, ctx, *choices):
+        await ctx.send(random.choice(choices))
+
 def setup(bot):
     bot.add_cog(Rng(bot))
