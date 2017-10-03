@@ -46,6 +46,7 @@ class Rng:
 
     @commands.command(aliases=['8', '8b'])
     async def ball(self, ctx, *, question):
+    async def ball(self, ctx, *, question=None):
         chance = ["It is certain","It is decidedly so","Without a doubt","Yes definitely","You may rely on it",
                   "As I see it, yes","Most likely","Outlook good","Yes","Signs point to yes","Reply hazy try again",
                   "Ask again later","Better not tell you now","Cannot predict now","Concentrate and ask again",
