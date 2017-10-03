@@ -58,5 +58,17 @@ class Rng:
     async def choose(self, ctx, *choices):
         await ctx.send(random.choice(choices))
 
+    @commands.command(aliases=['rolldice'])
+    async def dice(self, ctx, dice='1d6'):
+        """Roll a die in nDn format."""
+        output = []
+        if 'd' in dice.lower():
+            n, m = dice.lower().split('d')
+        else:
+            n, m = 1, dice
+        for i in range(int(n)):
+            output.append(str(random.randrange(1, int(m)+1)))
+        await ctx.send('```' + '\n'.join(output) + '```')
+
 def setup(bot):
     bot.add_cog(Rng(bot))
