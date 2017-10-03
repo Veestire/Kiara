@@ -46,6 +46,7 @@ class Rng:
 
     @commands.command(aliases=['8', '8b', '8ball'])
     async def ball(self, ctx, *, question=None):
+        """Ask the 8ball a question."""
         answers = [
             "It is certain", "It is decidedly so", "Without a doubt", "Yes definitely", "You may rely on it",
             "As I see it, yes", "Most likely", "Outlook good", "Yes", "Signs point to yes", "Reply hazy try again",
@@ -56,6 +57,7 @@ class Rng:
 
     @commands.command(aliases=['pick', 'choice'])
     async def choose(self, ctx, *choices):
+        """Picks a random entry from a list."""
         await ctx.send(random.choice(choices))
 
     @commands.command()
