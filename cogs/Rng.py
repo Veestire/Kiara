@@ -44,8 +44,7 @@ class Rng:
             r.emoji == re for re in ['✊', '✋', '✌']))
         await m.edit(content=f'`{user1.name}` {reaction1.emoji} {reaction2.emoji} `{user2.name}`')
 
-    @commands.command(aliases=['8', '8b'])
-    async def ball(self, ctx, *, question):
+    @commands.command(aliases=['8', '8b', '8ball'])
     async def ball(self, ctx, *, question=None):
         chance = ["It is certain","It is decidedly so","Without a doubt","Yes definitely","You may rely on it",
                   "As I see it, yes","Most likely","Outlook good","Yes","Signs point to yes","Reply hazy try again",
