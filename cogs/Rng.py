@@ -58,6 +58,11 @@ class Rng:
     async def choose(self, ctx, *choices):
         await ctx.send(random.choice(choices))
 
+    @commands.command()
+    async def roll(self, ctx, max: int=100):
+        """Rolls a random number between 0 and 100 inclusive."""
+        await ctx.send(random.randrange(0, max+1))
+
     @commands.command(aliases=['rolldice'])
     async def dice(self, ctx, dice='1d6'):
         """Roll a die in nDn format."""
