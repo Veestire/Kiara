@@ -28,7 +28,7 @@ class Manage:
         await ctx.guild.me.edit(nick=name)
 
     @manage.command(hidden=True, aliases=['ava'])
-    async def avatar(self, ctx, *, url=None):
+    async def avatar(self, ctx, url=None):
         """Set Rub's avatar."""
         if url:
             async with self.bot.session.get(url) as resp:
