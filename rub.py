@@ -8,6 +8,7 @@ import aiohttp
 
 import config
 from cogs.utils.helpformatter import RubHelpFormatter
+from cogs.utils.db import DB
 
 desc = 'A bot for rubs'
 
@@ -19,6 +20,7 @@ class Rub(commands.Bot):
         self.load_cogs()
         self.add_command(self.source)
         self.session = aiohttp.ClientSession(loop=self.loop)
+        self.db = DB(config.db_host, config.db_user, config.db_pass, 'rub', self.loop)
 
     def load_cogs(self):
         for cog in config.cogs:
@@ -33,6 +35,7 @@ class Rub(commands.Bot):
             self.uptime = datetime.datetime.utcnow()
         print(f'Ready: {self.user} (ID: {self.user.id})')
         print(f'Discord {discord.__version__}')
+        await self.db.connect()
 
     async def on_resumed(self):
         print('Resumed..')

@@ -9,26 +9,34 @@ class DB:
         self.db = db
         self.loop = loop
         self.con = None
+        self.pool = None
         self.cur = None
 
     async def connect(self):
         try:
-            self.con = await aiomysql.connect(host=self.host, port=3306, user=self.username, password=self.password,
-                                              db=self.db, loop=self.loop)
-            self.cur = await self.con.cursor(aiomysql.DictCursor)
+            self.pool = await aiomysql.create_pool(host=self.host, port=3306,
+                                                   user=self.username, password=self.password,
+                                                   db=self.db, loop=self.loop)
+            
         except:
             print("Couldn't connect to database.")
 
     async def execute(self, qry):
-        await self.cur.execute(qry)
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(qry)
 
     async def fetch(self, qry):
-        await self.cur.execute(qry)
-        r = await self.cur.fetchall()
-        return r
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(qry)
+                r = await cur.fetchall()
+                return r
 
     async def fetchone(self, qry):
-        await self.cur.execute(qry)
-        r = await self.cur.fetchone()
-        return r
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(qry)
+                r = await cur.fetchone()
+                return r
 
