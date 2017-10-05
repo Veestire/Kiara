@@ -216,7 +216,7 @@ class Admin:
     @commands.command(hidden=True)
     async def sql(self, ctx, *, query: str):
         """Run some SQL."""
-        await ctx.send(await ctx.db.fetch(query))
+        await ctx.send(await self.bot.db.fetch(query))
 
     @commands.command(hidden=True)
     async def do(self, ctx, times: int, *, command):
