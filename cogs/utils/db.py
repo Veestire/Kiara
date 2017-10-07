@@ -8,16 +8,13 @@ class DB:
         self.password = password
         self.db = db
         self.loop = loop
-        self.con = None
         self.pool = None
-        self.cur = None
 
     async def connect(self):
         try:
             self.pool = await aiomysql.create_pool(host=self.host, port=3306,
                                                    user=self.username, password=self.password,
                                                    db=self.db, loop=self.loop)
-            
         except:
             print("Couldn't connect to database.")
 
