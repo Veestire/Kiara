@@ -16,7 +16,6 @@ class Rub(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=['~'], description=desc, pm_help=None, help_attrs=dict(hidden=True))
         self.load_cogs()
-        self.add_command(self.source)
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.db = DB(config.db_host, config.db_user, config.db_pass, 'rub', self.loop)
 
