@@ -5,13 +5,14 @@ import discord
 from discord.ext import commands
 
 
-class Gala:
-    """Gala test commands"""
+class Halloween:
+    """Commands for the halloween event~"""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
+    @commands.guild_only()
     async def trickortreat(self, ctx):
         r = await self.bot.db.fetchone(f'SELECT `timestamp` FROM cooldowns WHERE user_id={ctx.author.id}')
         if not r:
@@ -37,4 +38,4 @@ class Gala:
 
 
 def setup(bot):
-    bot.add_cog(Gala(bot))
+    bot.add_cog(Halloween(bot))
