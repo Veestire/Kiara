@@ -23,6 +23,8 @@ class Halloween:
     @commands.group(aliases=['tot'])
     @commands.guild_only()
     async def trickortreat(self, ctx):
+        if ctx.invoked_subcommand:
+            return
         cooldown = datetime.timedelta(hours=self.conf['cooldown'])
         r = await self.bot.db.fetchone(f'SELECT `timestamp` FROM cooldowns WHERE user_id={ctx.author.id}')
         if not r:
@@ -50,11 +52,41 @@ class Halloween:
         await ctx.send(embed=emb)
 
     @trickortreat.command()
-    async def chance(self, ctx, value: int = None):
+    async def chance(self, ctx, *, value: float = None):
         if value:
-            pass
+            self.conf['chance'] = value
+            with open('trickortreat.json', 'w') as file:
+                json.dump(self.conf, file)
+            await ctx.send(f"Set the chance to `{value}%`!")
         else:
             await ctx.send(self.conf['chance'])
+
+    @trickortreat.command()
+    async def prize(self, ctx, *, value=None):
+        if value:
+            self.conf['prize'] = value
+            with open('trickortreat.json', 'w') as file:
+                json.dump(self.conf, file)
+            await ctx.send(f"Set the prize to `{value}`!")
+        else:
+            await ctx.send(self.conf['prize'])
+
+    @trickortreat.command()
+    async def cooldown(self, ctx, *, value: float = None):
+        if value:
+            self.conf['cooldown'] = value
+            with open('trickortreat.json', 'w') as file:
+                json.dump(self.conf, file)
+            await ctx.send(f"Set the cooldown to `{value}` hours!")
+        else:
+            await ctx.send(self.conf['cooldown'])
+
+    @commands.command()
+    async def raffleinfo(self, ctx):
+        fmt = f"Today's prize: {self.conf['prize']}\n" \
+              f"Win Percentage: {self.conf['chance']}%\n" \
+              f"Raffle Cooldown: {self.conf['cooldown']} hours\n"
+        await ctx.send(fmt)
 
 
 def setup(bot):
