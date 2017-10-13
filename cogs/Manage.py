@@ -2,34 +2,34 @@ import discord
 from discord.ext import commands
 
 class Manage:
-    """Commands for managing Rub as user"""
+    """Commands for managing Kiara as user"""
 
     def __init__(self, bot):
         self.bot = bot
 
     async def __local_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
+        return ctx.author.id in [73389450113069056, 211238461682876416]
 
     @commands.group(hidden=True, aliases=['set', 'mng'])
     async def manage(self, ctx):
-        """Manage Rub"""
+        """Manage Kiara"""
         if ctx.invoked_subcommand is None:
             raise commands.CommandInvokeError
 
     @manage.command(hidden=True, aliases=['user', 'name'])
     async def username(self, ctx, *, name):
-        """Set Rub's username."""
+        """Set Kiara's username."""
         await self.bot.user.edit(username=name)
 
     @manage.command(hidden=True, aliases=['nick'])
     @commands.guild_only()
     async def nickname(self, ctx, *, name=None):
-        """Set Rub's nickname."""
+        """Set Kiara's nickname."""
         await ctx.guild.me.edit(nick=name)
 
     @manage.command(hidden=True, aliases=['ava'])
     async def avatar(self, ctx, url=None):
-        """Set Rub's avatar."""
+        """Set Kiara's avatar."""
         if url:
             async with self.bot.session.get(url) as resp:
                 if resp.status == 200:
@@ -44,17 +44,17 @@ class Manage:
 
     @manage.command(hidden=True, aliases=['game'])
     async def playing(self, ctx, *, game: discord.Game = None):
-        """Set Rub's game."""
+        """Set Kiara's game."""
         await self.bot.change_presence(game=game)
 
     @manage.command(hidden=True)
     async def status(self, ctx, status = 'online'):
-        """Set Rub's status."""
+        """Set Kiara's status."""
         await self.bot.change_presence(status=discord.Status[status])
 
     @manage.command(hidden=True)
     async def stream(self, ctx, url=None, *, title=None):
-        """Set Rub's stream."""
+        """Set Kiara's stream."""
         if ctx.guild:
             await self.bot.change_presence(game=discord.Game(name=title or ctx.guild.me.game.name or '\u200b', url=url, type=1))
         else:

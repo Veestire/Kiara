@@ -15,8 +15,7 @@ desc = 'A bot for rubs'
 class Rub(commands.Bot):
 
     def __init__(self):
-        super().__init__(command_prefix=['!', '`', '.'], description=desc, pm_help=None, help_attrs=dict(hidden=True),
-                         formatter=RubHelpFormatter())
+        super().__init__(command_prefix=['~'], description=desc, pm_help=None, help_attrs=dict(hidden=True))
         self.load_cogs()
         self.add_command(self.source)
         self.session = aiohttp.ClientSession(loop=self.loop)
@@ -57,11 +56,6 @@ class Rub(commands.Bot):
 
     def run(self):
         super().run(config.token)
-
-    @commands.command()
-    async def source(self, ctx):
-        """A link to Rub's source code"""
-        await ctx.send('https://github.com/Nekorooni/Rub')
 
 
 if __name__ == '__main__':
