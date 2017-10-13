@@ -7,10 +7,9 @@ from discord.ext import commands
 import aiohttp
 
 import config
-from cogs.utils.helpformatter import RubHelpFormatter
 from cogs.utils.db import DB
 
-desc = 'A bot for rubs'
+desc = 'bot description here :3'
 
 class Rub(commands.Bot):
 
