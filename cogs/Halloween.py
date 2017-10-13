@@ -1,4 +1,5 @@
 import datetime
+import json
 import random
 
 import asyncio
@@ -15,11 +16,14 @@ class Halloween:
 
     def __init__(self, bot):
         self.bot = bot
+        self.conf = {}
+        with open('trickortreat.json') as file:
+            self.conf = json.load(file)
 
-    @commands.command()
+    @commands.group(aliases=['tot'])
     @commands.guild_only()
     async def trickortreat(self, ctx):
-        cooldown = datetime.timedelta(minutes=2)
+        cooldown = datetime.timedelta(hours=self.conf['cooldown'])
         r = await self.bot.db.fetchone(f'SELECT `timestamp` FROM cooldowns WHERE user_id={ctx.author.id}')
         if not r:
             await self.bot.db.execute(f'INSERT INTO cooldowns VALUES ({ctx.author.id}, "{ctx.message.created_at}")')
@@ -38,12 +42,19 @@ class Halloween:
             'pulled out... a sheet with cut-out eyes 👻',
         ]
         emb = discord.Embed(color=discord.Color(0xf18f26))
-        won = random.randrange(0, 100) < 25
+        won = random.uniform(0, 100) < self.conf['chance']
         if won:
             emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} pulled out... a small treasure chest!*')
         else:
             emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} {random.choice(responses)}*')
         await ctx.send(embed=emb)
+
+    @trickortreat.command()
+    async def chance(self, ctx, value: int = None):
+        if value:
+            pass
+        else:
+            await ctx.send(self.conf['chance'])
 
 
 def setup(bot):
