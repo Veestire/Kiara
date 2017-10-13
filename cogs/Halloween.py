@@ -95,10 +95,11 @@ class Halloween:
 
     @commands.command()
     async def raffleinfo(self, ctx):
-        fmt = f"Today's prize: {self.conf['prize']}\n" \
-              f"Win Percentage: {self.conf['chance']}%\n" \
-              f"Raffle Cooldown: {self.conf['cooldown']} hours\n"
-        await ctx.send(fmt)
+        emb = discord.Embed(color=discord.Color(0xf18f26), title='Raffle info')
+        emb.add_field(name='Current prize', value=f"{self.conf['prize']}")
+        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%", inline=True)
+        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours", inline=True)
+        await ctx.send(embed=emb)
 
 
 def setup(bot):
