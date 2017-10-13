@@ -1,3 +1,4 @@
+import datetime
 import random
 
 import asyncio
@@ -18,10 +19,13 @@ class Halloween:
         if not r:
             await self.bot.db.execute(f'INSERT INTO cooldowns VALUES ({ctx.author.id}, "{ctx.message.created_at}")')
         else:
-            print(r)
-        return
-        # d = abs(ctx.message.created_at - timestamp)
-        msg = f"You've recently entered the raffle, try again in {left}"
+            d = abs(ctx.message.created_at - r[0])
+            if d < datetime.timedelta(minutes=2):
+                await ctx.send(f"You've recently entered the raffle, try again in {d}")
+                return
+            else:
+                await self.bot.db.execute(
+                    f'UPDATE cooldowns SET timestamp="{ctx.message.created_at}" WHERE user_id={ctx.author.id}')
         responses = [
             'pulled out... a dead spider! 🕷',
             'pulled out... an old candy bar 🍬',
