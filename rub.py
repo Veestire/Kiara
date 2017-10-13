@@ -14,7 +14,8 @@ desc = 'bot description here :3'
 class Rub(commands.Bot):
 
     def __init__(self):
-        super().__init__(command_prefix=['~'], description=desc, pm_help=None, help_attrs=dict(hidden=True))
+        super().__init__(command_prefix=['~', '?'], description=desc, pm_help=None, help_attrs=dict(hidden=True),
+                         game=discord.Game(name='~help'))
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.db = DB(config.db_host, config.db_user, config.db_pass, 'rub', self.loop)
