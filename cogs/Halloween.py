@@ -96,9 +96,9 @@ class Halloween:
     @commands.command()
     async def raffleinfo(self, ctx):
         emb = discord.Embed(color=discord.Color(0xf18f26), title='Raffle info')
-        emb.add_field(name='Current prize', value=f"{self.conf['prize']}")
-        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%", inline=True)
-        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours", inline=True)
+        emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
+        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
+        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
         await ctx.send(embed=emb)
 
 
