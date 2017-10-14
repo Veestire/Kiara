@@ -18,6 +18,11 @@ def can_change():
         return ctx.author.id in [73389450113069056, 211238461682876416]
     return commands.check(predicate)
 
+def event_channel():
+    async def predicate(ctx):
+        return ctx.channel.id == 358962517290254356
+    return commands.check(predicate)
+
 
 class Halloween:
     """Commands for the halloween event~"""
@@ -30,7 +35,7 @@ class Halloween:
 
 
     @commands.group(aliases=['tot'])
-    @commands.guild_only()
+    @event_channel()
     async def trickortreat(self, ctx):
         if ctx.invoked_subcommand:
             return
