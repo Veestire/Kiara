@@ -60,7 +60,7 @@ class Halloween:
         emb = discord.Embed(color=discord.Color(0xf18f26))
         won = random.uniform(0, 100) < self.conf['chance']
         if won:
-            emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} pulled out... a small treasure chest!*')
+            emb.add_field(name='🎃 Trick Or Treat~', value=f'**{ctx.author.mention} pulled out... a small treasure chest!**')
         else:
             emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} {random.choice(responses)}*')
         await ctx.send(embed=emb)
