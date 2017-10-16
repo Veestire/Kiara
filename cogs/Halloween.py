@@ -66,7 +66,7 @@ class Halloween:
         else:
             emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} {random.choice(responses)}*')
         emb.set_footer(text=f'Rolled {roll:.2f} / 100 (Roll under {self.conf["chance"]} to win)',
-                       icon_url='https://canary.discordapp.com/assets/1adc9faf91526bb7a2c1d0b7b3516cae.svg')
+                       icon_url='https://cdn.discordapp.com/attachments/231008480079642625/369344924556197889/1adc9faf91526bb7a2c1d0b7b3516cae.png')
         await ctx.send(embed=emb)
 
     @trickortreat.command()
