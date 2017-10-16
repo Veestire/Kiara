@@ -60,7 +60,8 @@ class Halloween:
         emb = discord.Embed(color=discord.Color(0xf18f26))
         won = random.uniform(0, 100) < self.conf['chance']
         if won:
-            emb.add_field(name='🎃 Trick Or Treat~', value=f'**{ctx.author.mention} pulled out... a small treasure chest!**')
+            emb.add_field(name='🎃 Trick Or Treat~', value=f'**{ctx.author.mention} pulled out... a small treasure chest!** 🌟')
+            await self.dm_owner(ctx.author)
         else:
             emb.add_field(name='🎃 Trick Or Treat~', value=f'*{ctx.author.mention} {random.choice(responses)}*')
         await ctx.send(embed=emb)
@@ -105,6 +106,15 @@ class Halloween:
         emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
         emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
         await ctx.send(embed=emb)
+
+    async def dm_owner(self, winner):
+        owner = self.bot.get_user(73389450113069056)
+        emb = discord.Embed(color=discord.Color(0xf18f26), title='Raffle info')
+        emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
+        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
+        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
+        await owner.send(f"Hey master! Someone won the raffle!\nUser: {winner}\nAnd here's the info <3", embed=emb)
+
 
 
 def setup(bot):
