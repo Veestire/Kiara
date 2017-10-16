@@ -10,7 +10,7 @@ from discord.ext import commands
 def custom_format(td):
     minutes, seconds = divmod(td.seconds, 60)
     hours, minutes = divmod(minutes, 60)
-    return '{:d}:{:02d}'.format(hours, minutes)
+    return '{:d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
 
 
 def can_change():
