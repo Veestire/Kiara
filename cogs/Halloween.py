@@ -70,7 +70,7 @@ class Halloween:
         await ctx.send(embed=emb)
 
     @trickortreat.command()
-    @can_change()
+    @commands.has_permissions(administrator=True)
     async def chance(self, ctx, *, value: float = None):
         if value:
             self.conf['chance'] = value
@@ -81,7 +81,7 @@ class Halloween:
             await ctx.send(self.conf['chance'])
 
     @trickortreat.command()
-    @can_change()
+    @commands.has_permissions(administrator=True)
     async def prize(self, ctx, *, value=None):
         if value:
             self.conf['prize'] = value
@@ -92,7 +92,7 @@ class Halloween:
             await ctx.send(self.conf['prize'])
 
     @trickortreat.command()
-    @can_change()
+    @commands.has_permissions(administrator=True)
     async def cooldown(self, ctx, *, value: float = None):
         if value:
             self.conf['cooldown'] = value
