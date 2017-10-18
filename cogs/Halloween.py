@@ -102,6 +102,17 @@ class Halloween:
         else:
             await ctx.send(self.conf['cooldown'])
 
+    @trickortreat.command()
+    @commands.has_permissions(administrator=True)
+    async def resetcooldowns(self, ctx):
+        """Reset all user's raffle cooldowns"""
+        await self.bot.db.execute(f'UPDATE cooldowns SET timestamp="2000-01-01 00:00:00" WHERE 1')
+        await ctx.send('Cooldowns reset!')
+
+    @commands.command(hidden=True)
+    async def thot(self, ctx):
+        await ctx.send('<:NANI:359274287288418314>')
+
     @commands.command()
     async def raffleinfo(self, ctx):
         emb = discord.Embed(color=discord.Color(0xf18f26), title='Raffle info')
