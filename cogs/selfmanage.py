@@ -34,7 +34,7 @@ class Selfmanage:
         guild = self.bot.get_guild(GUILD_ID) or ctx.guild
         if not guild:
             return
-        await self.questionare(guild, ctx.author)
+        await self.questionare(guild, guild.get_member(ctx.author.id))
 
     async def questionare(self, guild, member):
         roles_to_add = []
