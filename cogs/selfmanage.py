@@ -29,11 +29,17 @@ class Selfmanage:
     def __init__(self, bot):
         self.bot = bot
 
+    async def on_member_join(self, member):
+        if member.guild.id == GUILD_ID:
+            await self.questionare(member.guild, member)
+
     @commands.command()
     async def intro(self, ctx):
         guild = self.bot.get_guild(GUILD_ID) or ctx.guild
         if not guild:
             return
+        if ctx.guild:
+            await ctx.send(f'{ctx.author.mention} I sent you a DM!')
         await self.questionare(guild, guild.get_member(ctx.author.id))
 
     async def questionare(self, guild, member):
