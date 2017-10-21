@@ -47,7 +47,7 @@ class Selfmanage:
         except asyncio.TimeoutError:
             await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
         else:
-            await member.add_roles(roles_to_add)
+            await member.add_roles(*roles_to_add)
             await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
 
     async def ask_question(self, user, question):
