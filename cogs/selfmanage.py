@@ -13,6 +13,7 @@ class Selfmanage:
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command()
     async def intro(self, ctx):
         await self.ask_question(ctx.author, 'How are you?')
         await ctx.send('okii')
