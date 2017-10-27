@@ -50,11 +50,11 @@ class Selfmanage:
             for question, role in self.questions:
                 if await self.ask_question(member, question):
                     roles_to_add.append(discord.utils.get(guild.roles, id=role))
-            if self.ask_question(member, "Are you currently in a relationship?"):
-                if self.ask_question(member, "Would you like to display you're taken?"):
+            if await self.ask_question(member, "Are you currently in a relationship?"):
+                if await self.ask_question(member, "Would you like to display you're taken?"):
                     roles_to_add.append(discord.utils.get(guild.roles, id=373135777955315712))
             else:
-                if self.ask_question(member, "Would you like to display you're single?"):
+                if await self.ask_question(member, "Would you like to display you're single?"):
                     roles_to_add.append(discord.utils.get(guild.roles, id=373135762230607882))
         except asyncio.TimeoutError:
             await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
