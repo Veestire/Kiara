@@ -46,7 +46,8 @@ class Selfmanage:
         roles_to_add = []
         await member.send(self.legal)
         try:
-            await self.bot.wait_for('message', check=lambda m: m.content == 'begin' and m.author == member, timeout=300)
+            await self.bot.wait_for('message',
+                                    check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
             for question, role in self.questions:
                 if await self.ask_question(member, question):
                     roles_to_add.append(discord.utils.get(guild.roles, id=role))
@@ -59,6 +60,7 @@ class Selfmanage:
         except asyncio.TimeoutError:
             await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
         else:
+            roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
             await member.add_roles(*roles_to_add)
             await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
 
