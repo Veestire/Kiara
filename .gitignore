@@ -4,7 +4,7 @@ rub-env/*
 data/*
 *.pyc
 
-conf.json
+*.json
 config.py
 
 ffmpeg.exe
