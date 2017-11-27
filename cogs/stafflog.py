@@ -61,7 +61,7 @@ class Stafflog:
         if guild.id != GUILD_ID:
             return
         await asyncio.sleep(2)
-        log = await member.guild.audit_logs(action=discord.AuditLogAction.unban).get(target__id=member.id)
+        log = await guild.audit_logs(action=discord.AuditLogAction.unban).get(target__id=member.id)
         if log:
             await self.make_case(member, 'Unban', log.reason)
 
