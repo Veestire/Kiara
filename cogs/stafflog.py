@@ -49,11 +49,11 @@ class Stafflog:
         if log:
             await self.make_case(member, 'Kick', log.reason)
 
-    async def on_member_ban(self, member):
-        if member.guild.id != GUILD_ID:
+    async def on_member_ban(self, guild, member):
+        if guild.id != GUILD_ID:
             return
         await asyncio.sleep(2)
-        log = await member.guild.audit_logs(action=discord.AuditLogAction.ban).get(target__id=member.id)
+        log = await guild.audit_logs(action=discord.AuditLogAction.ban).get(target__id=member.id)
         if log:
             await self.make_case(member, 'Ban', log.reason)
 
