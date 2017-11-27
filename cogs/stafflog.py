@@ -7,7 +7,6 @@ from discord.ext import commands
 GUILD_ID = 215424443005009920
 LOG_CHANNEL = 364983647087886336
 
-
 class Stafflog:
     """Logging the bans~"""
 
@@ -31,6 +30,7 @@ class Stafflog:
         await msg.edit(content='', embed=em)
 
     @commands.command()
+    @commands.has_role('Staff')
     async def reason(self, ctx, case_id: int, *, reason):
         m_id, = await self.bot.db.fetchone(
             f'SELECT message_id FROM stafflog WHERE id={case_id}')
@@ -40,10 +40,6 @@ class Stafflog:
         em['description'] = '\n'.join(em['description'].split('\n')[:2]) + f"\nReason: {reason}"
         await msg.edit(embed=discord.Embed.from_data(em))
         await ctx.message.delete()
-
-    @commands.command()
-    async def forcecase(self, ctx):
-        await self.make_case(ctx.author, 'Ban')
 
     async def on_member_remove(self, member):
         if member.guild.id != GUILD_ID:
