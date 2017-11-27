@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 
 GUILD_ID = 215424443005009920
-LOG_CHANNEL = 340779014237061131
+LOG_CHANNEL = 364983647087886336
 
 
 class Stafflog:
