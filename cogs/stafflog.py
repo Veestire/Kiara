@@ -13,7 +13,7 @@ class Stafflog:
     def __init__(self, bot):
         self.bot = bot
 
-    async def make_case(self, user, action, reason=None):
+    async def make_case(self, user, action, reason=None, responsible=None):
         date = datetime.datetime.utcnow()
         ch = self.bot.get_channel(LOG_CHANNEL)
         msg = await ch.send('Case')
@@ -25,7 +25,7 @@ class Stafflog:
         fmt = f"User: {user} ({user.id})\nAction: {action}\nReason: {reason}"
         em = discord.Embed(description=fmt)
         em.timestamp = date
-        em.set_footer(text=f'Case #{c_id}')
+        em.set_footer(text=f'{responsible} | Case #{c_id}')
 
         await msg.edit(content='', embed=em)
 
@@ -47,7 +47,7 @@ class Stafflog:
         await asyncio.sleep(2)
         log = await member.guild.audit_logs(action=discord.AuditLogAction.kick).get(target__id=member.id)
         if log:
-            await self.make_case(member, 'Kick', log.reason)
+            await self.make_case(member, 'Kick', log.reason, log.user)
 
     async def on_member_ban(self, guild, member):
         if guild.id != GUILD_ID:
@@ -55,7 +55,7 @@ class Stafflog:
         await asyncio.sleep(2)
         log = await guild.audit_logs(action=discord.AuditLogAction.ban).get(target__id=member.id)
         if log:
-            await self.make_case(member, 'Ban', log.reason)
+            await self.make_case(member, 'Ban', log.reasonn, log.user)
 
     async def on_member_unban(self, guild, member):
         if guild.id != GUILD_ID:
@@ -63,7 +63,7 @@ class Stafflog:
         await asyncio.sleep(2)
         log = await guild.audit_logs(action=discord.AuditLogAction.unban).get(target__id=member.id)
         if log:
-            await self.make_case(member, 'Unban', log.reason)
+            await self.make_case(member, 'Unban', log.reason, log.user)
 
 def setup(bot):
     bot.add_cog(Stafflog(bot))
