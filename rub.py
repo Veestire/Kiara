@@ -44,6 +44,8 @@ class Rub(commands.Bot):
             await ctx.send('This command is only for use inside guilds.')
         elif isinstance(error, commands.DisabledCommand):
             pass
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send(error)
         elif isinstance(error, commands.CommandInvokeError):
             print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
             traceback.print_tb(error.original.__traceback__)
