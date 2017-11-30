@@ -74,6 +74,7 @@ class Moderation:
         else:
             if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
                 ch = self.bot.get_channel(STAFF_CHANNEL)
+                member = await self.bot.get_user_info(member)
                 await ch.send(f"{ctx.author.mention} requests banning {member.mention}.")
                 await ctx.send('Your ban request has been received.')
 
