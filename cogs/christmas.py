@@ -30,7 +30,7 @@ class Christmas:
     def __init__(self, bot):
         self.bot = bot
         self.conf = {}
-        with open('raffle.json') as file:
+        with open('/home/Kiara/raffle.json') as file:
             self.conf = json.load(file)
 
     @commands.group()
@@ -74,7 +74,7 @@ class Christmas:
         if won:
             emb.add_field(name='🎁 Merry Christmas~', value=f'*{ctx.author.mention} {random.choice(pre)}*\n'
                                                             f'**A gift from santa, just for them!** 🌟')
-            # await self.dm_owner(ctx.author)
+            await self.dm_owner(ctx.author)
         else:
             emb.add_field(name='🎁 Merry Christmas~', value=f'*{ctx.author.mention} {random.choice(pre)}\n'
                                                             f'{random.choice(lose)}*')
@@ -87,7 +87,7 @@ class Christmas:
     async def chance(self, ctx, *, value: float = None):
         if value:
             self.conf['chance'] = value
-            with open('raffle.json', 'w') as file:
+            with open('/home/Kiara/raffle.json', 'w') as file:
                 json.dump(self.conf, file)
             await ctx.send(f"Set the chance to `{value}%`!")
         else:
@@ -98,7 +98,7 @@ class Christmas:
     async def prize(self, ctx, *, value=None):
         if value:
             self.conf['prize'] = value
-            with open('raffle.json', 'w') as file:
+            with open('/home/Kiara/raffle.json', 'w') as file:
                 json.dump(self.conf, file)
             await ctx.send(f"Set the prize to `{value}`!")
         else:
@@ -109,7 +109,7 @@ class Christmas:
     async def cooldown(self, ctx, *, value: float = None):
         if value:
             self.conf['cooldown'] = value
-            with open('raffle.json', 'w') as file:
+            with open('/home/Kiara/raffle.json', 'w') as file:
                 json.dump(self.conf, file)
             await ctx.send(f"Set the cooldown to `{value}` hours!")
         else:
