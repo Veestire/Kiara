@@ -57,7 +57,7 @@ class Moderation:
         else:
             if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
                 ch = self.bot.get_channel(STAFF_CHANNEL)
-                await ch.send(f"{ctx.author.mention} requests kicking {member.mention}.")
+                await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests kicking {member.mention}.")
                 await ctx.send('Your kick request has been received.')
 
     @commands.command()
@@ -75,7 +75,7 @@ class Moderation:
             if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
                 ch = self.bot.get_channel(STAFF_CHANNEL)
                 member = await self.bot.get_user_info(member)
-                await ch.send(f"{ctx.author.mention} requests banning {member.mention}.")
+                await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests banning {member.mention}.")
                 await ctx.send('Your ban request has been received.')
 
 
