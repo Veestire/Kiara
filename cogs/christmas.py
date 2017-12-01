@@ -34,7 +34,7 @@ class Christmas:
             self.conf = json.load(file)
 
     @commands.group()
-    @can_change()
+    @event_channel()
     async def raffle(self, ctx):
         if ctx.invoked_subcommand:
             return
