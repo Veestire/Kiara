@@ -45,7 +45,7 @@ class Moderation:
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('Staff', 'Mini-Mod')
+    @commands.has_any_role('Staff')
     async def kick(self, ctx, member: discord.Member, *, reason=None):
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'kick_members', None):
@@ -55,13 +55,12 @@ class Moderation:
             except Exception as e:
                 await ctx.send(e)
         else:
-            if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
-                ch = self.bot.get_channel(STAFF_CHANNEL)
-                await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests kicking {member.mention}.")
-                await ctx.send('Your kick request has been received.')
+            ch = self.bot.get_channel(STAFF_CHANNEL)
+            await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests kicking {member.mention}.")
+            await ctx.send('Your kick request has been received.')
 
     @commands.command()
-    @commands.has_any_role('Staff', 'Mini-Mod')
+    @commands.has_any_role('Staff')
     async def ban(self, ctx, member: MemberID, *, reason=None):
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
@@ -72,15 +71,14 @@ class Moderation:
             except Exception as e:
                 await ctx.send(e)
         else:
-            if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
-                ch = self.bot.get_channel(STAFF_CHANNEL)
-                member = await self.bot.get_user_info(member)
-                await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests banning {member.mention}.")
-                await ctx.send('Your ban request has been received.')
+            ch = self.bot.get_channel(STAFF_CHANNEL)
+            member = await self.bot.get_user_info(member)
+            await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests banning {member.mention}.")
+            await ctx.send('Your ban request has been received.')
 
 
     @commands.command()
-    @commands.has_any_role('Staff', 'Mini-Mod')
+    @commands.has_any_role('Staff')
     async def unban(self, ctx, member: BannedMember, *, reason=None):
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
@@ -90,10 +88,9 @@ class Moderation:
             except Exception as e:
                 await ctx.send(e)
         else:
-            if discord.utils.get(ctx.author.roles, name="Mini-Mod"):
-                ch = self.bot.get_channel(STAFF_CHANNEL)
-                await ch.send(f"{ctx.author.mention} requests unbanning {member.user.mention}.")
-                await ctx.send('Your uban request has been received.')
+            ch = self.bot.get_channel(STAFF_CHANNEL)
+            await ch.send(f"{ctx.author.mention} requests unbanning {member.user.mention}.")
+            await ctx.send('Your uban request has been received.')
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
