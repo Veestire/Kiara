@@ -7,7 +7,7 @@ class Silhouette:
 
     async def on_member_join(self, member):
         if member.name.lower() == 'silhouette':
-            await member.ban(reason='Spam bot')
+            await member.kick(reason='Spam bot')
 
 def setup(bot):
     bot.add_cog(Silhouette(bot))
