@@ -28,6 +28,7 @@ class Selfmanage:
         ('Are you interested in seeing vanilla 18+ content? (Includes #hentai, #ecchi, #porn, #rule-34, #doujins #hentai-gifs)', 371251751564869632),
         ('Are you interetsed in seeing kink-related 18+ content? (Includes #anal, #feet, #femdom, #bondage, #petplay, #yuri, #yaoi, #trap, #futa, #tentacles, #furry)', 371251837946560533),
         ('Are you interested in seeing extreme 18+ content? (Includes #extreme, #ahegao, #forced)', 323409208584306700),
+        ('Are you interested in roleplay channels?', 389376686745059329),
     ]
 
     def __init__(self, bot):
@@ -65,6 +66,7 @@ class Selfmanage:
             await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
         else:
             roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
+            await member.send("Please give me a few seconds to finalize everything.")
             await member.remove_roles(*[discord.utils.get(guild.roles, id=x) for x in self.all_roles])
             await member.add_roles(*roles_to_add)
             await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
@@ -84,6 +86,18 @@ class Selfmanage:
             return True
         else:
             return False
+
+    @commands.command()
+    async def request(self, ctx, *, role):
+        roles = {
+            'roleplay': 389376686745059329
+        }
+        if role.lower() in roles:
+            guild = ctx.guild or self.bot.get_guild(GUILD_ID)
+            await guild.get_member(ctx.author.id).add_roles(discord.utils.get(guild.roles, id=roles[role.lower()]))
+            await ctx.send(f'I gave you the {role} role!')
+        else:
+            await ctx.send('Please request a valid role')
 
 
 def setup(bot):
