@@ -8,7 +8,7 @@ class DB:
         self.password = password
         self.db = db
         self.loop = loop
-        self.pool = None
+        loop.run_until_complete(self.connect())
 
     async def connect(self):
         try:
@@ -38,3 +38,16 @@ class DB:
                 await cur.execute(qry)
                 r = await cur.fetchone()
                 return r
+
+    async def fetchdict(self, qry):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute(qry)
+                return await cur.fetchone()
+
+    async def fetchdicts(self, qry):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute(qry)
+                return await cur.fetchall()
+
