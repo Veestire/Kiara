@@ -1,3 +1,5 @@
+import datetime
+
 from discord.ext import commands
 
 import asyncio
@@ -6,6 +8,7 @@ import random
 
 
 STAFF_CHANNEL = 231008480079642625
+MUTED_ROLE = 348331525479071745
 
 class MemberID(commands.Converter):
     async def convert(self, ctx, argument):
@@ -43,6 +46,7 @@ class Moderation:
 
     def __init__(self, bot):
         self.bot = bot
+        self.timers = bot.get_cog('Timers')
 
     @commands.command()
     @commands.has_any_role('Staff')
@@ -91,6 +95,19 @@ class Moderation:
             ch = self.bot.get_channel(STAFF_CHANNEL)
             await ch.send(f"{ctx.author.mention} requests unbanning {member.user.mention}.")
             await ctx.send('Your uban request has been received.')
+
+    @commands.command()
+    @commands.has_role('Staff')
+    async def mute(self, ctx, member: discord.Member, minutes: int = 5, *, reason = None):
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=MUTED_ROLE))
+        await self.timers.create_timer('unmute', datetime.datetime.utcnow() + datetime.timedelta(minutes=minutes),
+                                       [ctx.guild.id, member.id])
+
+    async def on_unmute_event(self, guild_id, user_id):
+        guild = self.bot.get_guild(guild_id)
+        member = guild.get_member(user_id)
+        await member.remove_roles(discord.utils.get(guild.roles, id=MUTED_ROLE))
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
