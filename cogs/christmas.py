@@ -56,7 +56,7 @@ class Christmas:
             'opened a cardboard box, and pulled out...',
             'got something thrown at them, it was...',
             'got a present from a passerby, it contained...',
-            'found found a suspicious looking box on the floor, it contained...'
+            'found a suspicious looking box on the floor, it contained...'
         ]
         lose = [
             'Coal… Lots of coal.',
