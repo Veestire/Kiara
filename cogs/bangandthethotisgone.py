@@ -41,7 +41,7 @@ class Bangandthethotisgone:
 
     def __init__(self, bot):
         self.bot = bot
-        with open('data.json') as json_file:
+        with open('/home/Kiara/data.json') as json_file:
             self.data = json.load(json_file)
 
     async def generateEmbed(self, title, imageurl):
