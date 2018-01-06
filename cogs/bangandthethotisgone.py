@@ -53,7 +53,7 @@ class BangAndTheThotIsGone:
         embed.set_image(url=image_url)
         return embed
 
-    @commands.group(name="BegoneManage")
+    @commands.group(name="begonemanage")
     async def begone_manage(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid subcommand passed')
