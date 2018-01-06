@@ -26,7 +26,7 @@ class MemberID(commands.Converter):
             return m.id
 
 
-class Bangandthethotisgone:
+class BangAndTheThotIsGone:
     """Begone Thot meme command!"""
 
     # Current staff members as of 04/01/2018
@@ -44,10 +44,42 @@ class Bangandthethotisgone:
         with open('/home/Kiara/data.json') as json_file:
             self.data = json.load(json_file)
 
-    async def generateEmbed(self, title, imageurl):
+    async def save_json(self, data):
+        with open('/home/Kiara/data.json', 'w') as json_file_to_write:
+            json.dump(data, json_file_to_write)
+
+    async def generate_embed(self, title, image_url):
         embed = discord.Embed(title=title, colour=discord.Colour(0xd39466))
-        embed.set_image(url=imageurl)
+        embed.set_image(url=image_url)
         return embed
+
+    @commands.group(name="BegoneManage")
+    async def begone_manage(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send('Invalid subcommand passed')
+
+    @begone_manage.command()
+    @commands.has_any_role('Staff')
+    async def add_image(self, ctx, ImageURL, memberID='Default'):
+        self.data[memberID].append(ImageURL)
+        await self.save_json(self.data)
+
+    @begone_manage.command()
+    @commands.has_any_role('Staff')
+    async def remove_image(self, ctx, ImageID: int, memberID='Default'):
+        member_images = self.data[memberID]
+        try:
+            member_images.pop(ImageID)
+            self.data[memberID] = member_images
+            await self.save_json(self.data)
+        except Exception as e:
+            await ctx.send(e)
+
+    @begone_manage.command()
+    async def list_images(self, ctx, memberID="Default"):
+        member_images = self.data[memberID]
+        for i in range(0, len(member_images)):
+            await ctx.send(embed=await self.generate_embed(i, member_images[i]))
 
     @commands.command(name="begone", aliases=["thot", "begonethot"])
     @commands.has_any_role('Staff')
@@ -60,10 +92,10 @@ class Bangandthethotisgone:
                 if str(ctx.author.id) in self.data:
                     if self.data[str(ctx.author.id)]:
                         return await ctx.send(
-                            embed=await self.generateEmbed(f'Banned {member}!',
-                                                           random.choice(self.data[str(ctx.author.id)])))
+                            embed=await self.generate_embed(f'Banned {member}!',
+                                                            random.choice(self.data[str(ctx.author.id)])))
                 await ctx.send(
-                    embed=await self.generateEmbed(f'Banned {member}!', random.choice(self.data["Default"])))
+                    embed=await self.generate_embed(f'Banned {member}!', random.choice(self.data["Default"])))
             except Exception as e:
                 await ctx.send(e)
         else:
@@ -73,4 +105,4 @@ class Bangandthethotisgone:
             await ctx.send('Your ban request has been received.')
 
 def setup(bot):
-    bot.add_cog(Bangandthethotisgone(bot))
+    bot.add_cog(BangAndTheThotIsGone(bot))
