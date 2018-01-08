@@ -3,7 +3,6 @@
 rub-env/*
 data/*
 *.pyc
-
 *.json
 config.py
 
