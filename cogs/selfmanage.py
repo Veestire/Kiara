@@ -33,6 +33,7 @@ class Selfmanage:
 
     def __init__(self, bot):
         self.bot = bot
+        self.active_intros = []
 
     async def on_member_join(self, member):
         if member.guild.id == GUILD_ID:
@@ -45,6 +46,10 @@ class Selfmanage:
 
     @commands.command()
     async def intro(self, ctx):
+        if ctx.author.id in self.active_intros:
+            return await ctx.send("You're already doing the intro.")
+        else:
+            self.active_intros += [ctx.author.id]
         guild = self.bot.get_guild(GUILD_ID) or ctx.guild
         if not guild:
             return
@@ -73,11 +78,16 @@ class Selfmanage:
             except:
                 pass
         else:
-            roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
-            await member.send("Please give me a few seconds to finalize everything.")
-            await member.remove_roles(*[discord.utils.get(guild.roles, id=x) for x in self.all_roles])
-            await member.add_roles(*roles_to_add)
-            await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
+            try:
+                roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
+                await member.send("Please give me a few seconds to finalize everything.")
+                await member.remove_roles(*[discord.utils.get(guild.roles, id=x) for x in self.all_roles])
+                await member.add_roles(*roles_to_add)
+                await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
+            except Exception as e:
+                print(e)
+        self.active_intros.remove(member.id)
+
 
     async def ask_question(self, user, question):
         def check(m):
