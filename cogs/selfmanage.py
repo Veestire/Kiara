@@ -42,14 +42,13 @@ class Selfmanage:
                 if 'intro' in msg.content:
                     return
             except asyncio.TimeoutError:
-                await self.questionare(member.guild, member)
+                pass
+            await self.questionare(member.guild, member)
 
     @commands.command()
     async def intro(self, ctx):
         if ctx.author.id in self.active_intros:
             return await ctx.send("You're already doing the intro.")
-        else:
-            self.active_intros += [ctx.author.id]
         guild = self.bot.get_guild(GUILD_ID) or ctx.guild
         if not guild:
             return
@@ -58,6 +57,10 @@ class Selfmanage:
         await self.questionare(guild, guild.get_member(ctx.author.id))
 
     async def questionare(self, guild, member):
+        if member.id in self.active_intros:
+            return
+        else:
+            self.active_intros += [member.id]
         roles_to_add = []
         await member.send(self.legal)
         try:
