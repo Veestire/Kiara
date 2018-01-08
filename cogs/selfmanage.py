@@ -36,7 +36,12 @@ class Selfmanage:
 
     async def on_member_join(self, member):
         if member.guild.id == GUILD_ID:
-            await self.questionare(member.guild, member)
+            try:
+                m = await self.bot.wait_for('message', timeout=300)
+                if 'intro' in m.content:
+                    return
+            except:
+                await self.questionare(member.guild, member)
 
     @commands.command()
     async def intro(self, ctx):
