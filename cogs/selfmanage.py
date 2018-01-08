@@ -37,8 +37,8 @@ class Selfmanage:
     async def on_member_join(self, member):
         if member.guild.id == GUILD_ID:
             try:
-                m = await self.bot.wait_for('message', timeout=300)
-                if 'intro' in m.content:
+                msg = await self.bot.wait_for('message', check=lambda m: m.author.id == member.id, timeout=300)
+                if 'intro' in msg.content:
                     return
             except:
                 await self.questionare(member.guild, member)
@@ -68,7 +68,10 @@ class Selfmanage:
                 if await self.ask_question(member, "Would you like to display you're single?"):
                     roles_to_add.append(discord.utils.get(guild.roles, id=373135762230607882))
         except asyncio.TimeoutError:
-            await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
+            try:
+                await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
+            except:
+                pass
         else:
             roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
             await member.send("Please give me a few seconds to finalize everything.")
