@@ -41,7 +41,7 @@ class Selfmanage:
                 msg = await self.bot.wait_for('message', check=lambda m: m.author.id == member.id, timeout=300)
                 if 'intro' in msg.content:
                     return
-            except:
+            except asyncio.TimeoutError:
                 await self.questionare(member.guild, member)
 
     @commands.command()
@@ -77,6 +77,7 @@ class Selfmanage:
                 await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
             except:
                 pass
+            self.active_intros.remove(member.id)
         else:
             try:
                 roles_to_add.append(discord.utils.get(guild.roles, id=373122164544765953))
@@ -86,7 +87,7 @@ class Selfmanage:
                 await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
             except Exception as e:
                 print(e)
-        self.active_intros.remove(member.id)
+            self.active_intros.remove(member.id)
 
 
     async def ask_question(self, user, question):
