@@ -60,9 +60,10 @@ class Selfmanage:
         if member.id in self.active_intros:
             return
         else:
+            await member.send(self.legal)
             self.active_intros += [member.id]
         roles_to_add = []
-        await member.send(self.legal)
+
         try:
             await self.bot.wait_for('message',
                                     check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
