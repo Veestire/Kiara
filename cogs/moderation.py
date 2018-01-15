@@ -47,6 +47,7 @@ class Moderation:
     def __init__(self, bot):
         self.bot = bot
         self.timers = bot.get_cog('Timers')
+        self.stafflog = bot.get_cog('Stafflog')
 
     @commands.command()
     @commands.has_any_role('Staff')
@@ -102,6 +103,7 @@ class Moderation:
         await member.add_roles(discord.utils.get(ctx.guild.roles, id=MUTED_ROLE))
         await self.timers.create_timer('unmute', datetime.datetime.utcnow() + datetime.timedelta(minutes=minutes),
                                        [ctx.guild.id, member.id])
+        await self.stafflog.make_case(member, f'Mute ({minutes} minute{"s" if minutes!=1 else ""})', reason, ctx.author)
 
     async def on_unmute_event(self, guild_id, user_id):
         guild = self.bot.get_guild(guild_id)
