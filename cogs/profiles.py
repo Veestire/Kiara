@@ -122,8 +122,6 @@ class Profiles:
 
     @commands.command(hidden=True)
     async def leaderboard(self, ctx):
-        if not member:
-            member = ctx.author
         qry = f"""
         select `level`, `experience`, `rank` FROM
         (
