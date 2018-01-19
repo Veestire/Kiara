@@ -123,7 +123,7 @@ class Profiles:
     @commands.command(hidden=True)
     async def leaderboard(self, ctx):
         qry = f"""
-        select `level`, `experience`, `rank` FROM
+        select `user_id`, `level`, `experience`, `rank` FROM
         (
         select t.*, @r := @r + 1 as `rank`
         from  profiles t,
@@ -133,7 +133,7 @@ class Profiles:
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
-        output = '```\n'+'\n'.join([f"{rank} - {ctx.guild.get_member(user_id)}" for lxl, xp, rank in r])+'```'
+        output = '```\n'+'\n'.join([f"{rank} - {ctx.guild.get_member(user_id)}" for user_id, lxl, xp, rank in r])+'```'
         await ctx.send(output)
 
     @commands.command(hidden=True)
