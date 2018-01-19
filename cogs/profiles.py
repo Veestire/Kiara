@@ -52,7 +52,7 @@ class Profiles:
 
     def __init__(self, bot):
         self.bot = bot
-        # self.cooldowns = {}
+        self.cooldowns = {}
         self.profiles = {}
 
     async def get_profile(self, u_id, keys=None):
@@ -77,9 +77,9 @@ class Profiles:
         if msg.author.bot:
             return
         profile = await self.get_profile(msg.author.id, ('level', 'experience', 'coins'))
-        # d = abs(msg.created_at - self.cooldowns.get(profile.pid, datetime.datetime(2000, 1, 1)))
-        # if d < datetime.timedelta(seconds=20):
-        #     return
+        d = abs(msg.created_at - self.cooldowns.get(profile.pid, datetime.datetime(2000, 1, 1)))
+        if d < datetime.timedelta(seconds=5):
+            return
         profile.experience += 10
         if msg.attachments:
             profile.experience += 10
@@ -89,7 +89,7 @@ class Profiles:
             profile.level += 1
             profile.experience -= needed
         await profile.save(self.bot.db)
-        # self.cooldowns[profile.pid] = msg.created_at
+        self.cooldowns[profile.pid] = msg.created_at
 
     @commands.command(hidden=True)
     @commands.has_role('Admin')
