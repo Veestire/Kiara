@@ -92,7 +92,7 @@ class Profiles:
         self.cooldowns[profile.pid] = msg.created_at
 
     @commands.command(hidden=True)
-    @commands.has_role('Admin')
+    @commands.has_permissions(administrator=True)
     async def setlevel(self, ctx, member: discord.Member, level: int, xp: int= None):
         ctx.profile = await self.get_profile(member.id, ['level'])
         ctx.profile.level = level
