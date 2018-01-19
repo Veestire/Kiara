@@ -121,7 +121,7 @@ class Profiles:
         await ctx.send(embed=em)
 
     @commands.command(hidden=True)
-    async def leaderboard(self, ctx, member: discord.Member = None):
+    async def leaderboard(self, ctx):
         if not member:
             member = ctx.author
         qry = f"""
@@ -136,10 +136,8 @@ class Profiles:
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
-        output = '\n'.join([f"{rank} - {ctx.guild.get_member(user_id)}" for lxl, xp, rank in r])
-        em = discord.Embed(title=f'**{member}**',
-                           description=f'**Rank {rank} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
-        await ctx.send(embed=em)
+        output = '```\n'+'\n'.join([f"{rank} - {ctx.guild.get_member(user_id)}" for lxl, xp, rank in r])+'```'
+        await ctx.send(output)
 
     @commands.command(hidden=True)
     async def xp(self, ctx, member: discord.Member = None):
