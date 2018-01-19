@@ -99,7 +99,7 @@ class Profiles:
         await ctx.profile.save(self.bot.db)
         await ctx.send(f"{member} is now level {level}")
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def rank(self, ctx, member: discord.Member = None):
         if not member:
             member = ctx.author
@@ -118,7 +118,28 @@ class Profiles:
                            description=f'**Rank {rank} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
         await ctx.send(embed=em)
 
-    @commands.command()
+    @commands.command(hidden=True)
+    async def leaderboard(self, ctx, member: discord.Member = None):
+        if not member:
+            member = ctx.author
+        qry = f"""
+        select `level`, `experience`, `rank` FROM
+        (
+        select t.*, @r := @r + 1 as `rank`
+        from  profiles t,
+        (select @r := 0) r
+        order by `level` desc, `experience` desc
+        ) as t
+        where `user_id`={member.id}
+        limit 10
+        """
+        r = await ctx.bot.db.fetch(qry)
+        output = '\n'.join([f"{rank} - {ctx.guild.get_member(user_id)}" for lxl, xp, rank in r])
+        em = discord.Embed(title=f'**{member}**',
+                           description=f'**Rank {rank} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
+        await ctx.send(embed=em)
+
+    @commands.command(hidden=True)
     async def xp(self, ctx, member: discord.Member = None):
         if not member:
             member = ctx.author
