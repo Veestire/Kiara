@@ -116,7 +116,7 @@ class Profiles:
         where `user_id`={member.id}
         """
         lvl, xp, rank = await ctx.bot.db.fetchone(qry)
-        em = discord.Embed(title=f'**{member}**',
+        em = discord.Embed(title=f'**{member.display_name}**',
                            description=f'**Rank {rank} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
         await ctx.send(embed=em)
 
@@ -134,7 +134,7 @@ class Profiles:
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
-        output = '```\n'+'\n'.join([f"{rank} - {guild.get_member(user_id)}" for user_id, lxl, xp, rank in r])+'```'
+        output = '```\n'+'\n'.join([f"{int(rank)} - {guild.get_member(user_id).display_name} - Lv{lvl} {xp}/{exp_needed(lvl)}xp" for user_id, lvl, xp, rank in r])+'```'
         await ctx.send(output)
 
     @commands.command(hidden=True)
