@@ -132,7 +132,6 @@ class Profiles:
         (select @r := 0) r
         order by `level` desc, `experience` desc
         ) as t
-        where `user_id`={member.id}
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
