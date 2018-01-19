@@ -81,6 +81,8 @@ class Profiles:
         # if d < datetime.timedelta(seconds=20):
         #     return
         profile.experience += 10
+        if msg.attachments:
+            profile.experience += 10
         profile.coins += 1
         needed = exp_needed(profile.level)
         if profile.experience >= needed:
