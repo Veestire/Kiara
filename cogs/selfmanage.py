@@ -17,7 +17,7 @@ class Selfmanage:
         353019520983629824, 347689132908085248, 371251751564869632, 371251837946560533, 323409208584306700,
         373135777955315712, 373135762230607882
     ]
-    legal = "Welcome to Eden's Garden, the home of all your lewd socialising needs! " \
+    legal = "Welcome to Waifu Worshipping, the home of all your lewd socialising needs! " \
             "Please make sure to read over #information and #rules to learn the essentials.\n" \
             "Also understand that due to the content of the server, all users are required to be over the age of 18.\n"\
             "By continuing with these questions, you confirm that you are of legal age.\n\n" \
