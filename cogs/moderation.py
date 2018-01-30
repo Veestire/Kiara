@@ -1,5 +1,6 @@
 import datetime
 
+from .utils import time
 from discord.ext import commands
 
 import asyncio
@@ -109,6 +110,47 @@ class Moderation:
         guild = self.bot.get_guild(guild_id)
         member = guild.get_member(user_id)
         await member.remove_roles(discord.utils.get(guild.roles, id=MUTED_ROLE))
+
+    @commands.command(aliases=['finduser'])
+    @commands.guild_only()
+    @commands.has_permissions(kick_members=True)
+    async def userfind(self, ctx, *, search):
+        found = []
+
+        if not ctx.guild.chunked:
+            await self.bot.request_offline_members(ctx.guild)
+
+        for m in ctx.guild.members:
+            if search.lower() in m.name.lower():
+                found += [m]
+        if found:
+            await ctx.send('Matches users:```\n'+'\n'.join([f'{m} ({m.id})' for m in found])+'```')
+        else:
+            await ctx.send('Found nothing')
+
+    @commands.command(aliases=['newmembers'])
+    @commands.guild_only()
+    @commands.has_permissions(kick_members=True)
+    async def newusers(self, ctx, *, count=5):
+        """Tells you the newest members of the server.
+        This is useful to check if any suspicious members have
+        joined.
+        The count parameter can only be up to 25.
+        """
+        count = max(min(count, 25), 5)
+
+        if not ctx.guild.chunked:
+            await self.bot.request_offline_members(ctx.guild)
+
+        members = sorted(ctx.guild.members, key=lambda m: m.joined_at, reverse=True)[:count]
+
+        e = discord.Embed(title='New Members', colour=discord.Colour.green())
+
+        for member in members:
+            body = f'joined {time.time_ago(member.joined_at)}, created {time.time_ago(member.created_at)}'
+            e.add_field(name=f'{member} (ID: {member.id})', value=body, inline=False)
+
+        await ctx.send(embed=e)
 
 
 def setup(bot):
