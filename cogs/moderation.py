@@ -170,7 +170,7 @@ class Moderation:
         e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
         await ctx.send(embed=e)
 
-    @commands.command()
+    @commands.command(aliases=['bumped'])
     @commands.has_role('Staff')
     async def bump(self, ctx, *, time_till_bump='6h'):
         """Tell kiara you bumped the server so she can remind you.
