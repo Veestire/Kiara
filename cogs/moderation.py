@@ -2,7 +2,7 @@ import datetime
 
 from .utils import time
 from discord.ext import commands
-
+import parsedatetime as pdt
 import asyncio
 import discord
 import random
@@ -10,6 +10,12 @@ import random
 
 STAFF_CHANNEL = 231008480079642625
 MUTED_ROLE = 348331525479071745
+BUMP_CHANNEL = 407581915726610443
+
+def get_date(text):
+    cal = pdt.Calendar()
+    time, res = cal.parseDT(text, datetime.datetime.utcnow())
+    return time if res else None
 
 class MemberID(commands.Converter):
     async def convert(self, ctx, argument):
@@ -163,6 +169,29 @@ class Moderation:
         e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
         e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
         await ctx.send(embed=e)
+
+    @commands.command()
+    @commands.has_role('Staff')
+    async def bump(self, ctx, *, time_till_bump='6h'):
+        """Tell kiara you bumped the server so she can remind you.
+        Defaults to 6 hours if you leave the time out.
+        
+        You can copy the exact time as shown on discord.me as time input, for example:
+        ~bump 4h 21m 54s
+        """
+        t = get_date(time_till_bump)
+        if t:
+            await self.timers.create_timer('bumpreminder', t)
+            await ctx.send(f'Bump reminder set for {t} (UTC) <a:twitch:406319471272263681>')
+        else:
+            await ctx.send(f'Please supply a better time format.')
+
+    async def on_bumpreminder_event(self):
+        ch = self.bot.get_channel(BUMP_CHANNEL)
+        e = discord.Embed(title="Server can be bumped!", colour=discord.Colour.purple(),
+                          description=f'Click [here](https://discord.me/server/bump-server/8742) for the bump page!')
+        e.timestamp = datetime.datetime.utcnow()
+        await ch.send(f"<@&407767148660916227>", embed=e)
 
 
 def setup(bot):
