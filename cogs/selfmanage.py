@@ -60,7 +60,10 @@ class Selfmanage:
         if member.id in self.active_intros:
             return
         else:
-            await member.send(self.legal)
+            try:
+                await member.send(self.legal)
+            except discord.errors.Forbidden:
+                return
             self.active_intros += [member.id]
         roles_to_add = []
 
