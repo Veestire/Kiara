@@ -9,7 +9,7 @@ import aiohttp
 import config
 from cogs.utils.db import DB
 
-desc = 'bot description here :3'
+desc = 'A personal bot for Waifu Worshipping'
 
 class Rub(commands.Bot):
 
