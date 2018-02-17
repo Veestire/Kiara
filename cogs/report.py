@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord.ext import commands
 
-STAFF_CHANNEL = 231008480079642625
+REPORT_CHANNEL = 414544787325059082
 
 
 class Report:
@@ -73,7 +73,7 @@ class Report:
                 await self.bot.db.execute('INSERT INTO `reports` (`reporter`, `about`, `content`, `proof`) VALUES '
                                           '(%s, %s, %s, %s)',
                                           args=(ctx.author.id, report_user, report_reason, "\n".join(proof)))
-                await self.bot.get_channel(STAFF_CHANNEL).send(f'{ctx.author} sent a report.', embed=r_embed)
+                await self.bot.get_channel(REPORT_CHANNEL).send(f'{ctx.author} sent a report.', embed=r_embed)
                 await ctx.send("**Thanks for your report**\nIt'll be reviewed shortly.")
         except asyncio.TimeoutError:
             await ctx.send("You took too long, write `~report` if you wish to start over.")
