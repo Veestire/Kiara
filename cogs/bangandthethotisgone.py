@@ -27,6 +27,7 @@ class BangAndTheThotIsGone:
             self.data = json.load(json_file)
 
     @commands.group(name="begonemanage")
+    @commands.has_any_role('Staff')
     async def begone_manage(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid sub-command passed')
@@ -66,6 +67,7 @@ class BangAndTheThotIsGone:
             await ctx.send(e)
 
     @begone_manage.command()
+    @commands.has_any_role('Staff')
     async def list_images(self, ctx, memberid="Default"):
         member_images = self.data[memberid]
         for i in range(0, len(member_images)):
