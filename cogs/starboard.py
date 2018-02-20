@@ -5,12 +5,15 @@ import discord
 STAR_CHANNEL = 415464201809690624
 STAR_THRESHOLD = 5
 
+IGNORED = [271695900718399488]
 
 class Starboard:
     """Starboard pinning quotes stuff"""
 
     async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
         if channel_id == STAR_CHANNEL:
+            return
+        if channel_id in IGNORED:
             return
         if str(emoji) != '\N{WHITE MEDIUM STAR}':
             return
