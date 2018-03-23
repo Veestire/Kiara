@@ -24,12 +24,15 @@ def event_channel():
     return commands.check(predicate)
 
 
-class Christmas:
-    """Commands for the christmas event~"""
+class Raffle:
+    """Raffle related commands"""
 
     def __init__(self, bot):
         self.bot = bot
         self.conf = {}
+
+        self.raffle_title = "🐰 The Easter Bunny's Arrived~ 🐇"
+
         with open('/home/Kiara/raffle.json') as file:
             self.conf = json.load(file)
 
@@ -68,15 +71,15 @@ class Christmas:
             f'{random.randrange(10,100)} used matches.',
             'Expired milk.'
         ]
-        emb = discord.Embed(color=discord.Color(0xfdd888))
+        emb = discord.Embed(color=discord.Color(0xbdeefe))
         roll = random.uniform(0, 100)
         won = roll <= self.conf['chance']
         if won:
-            emb.add_field(name='🎁 Merry Christmas~', value=f'*{ctx.author.mention} {random.choice(pre)}*\n'
+            emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}*\n'
                                                             f'**A gift from santa, just for them!** 🌟')
             await self.dm_owner(ctx.author)
         else:
-            emb.add_field(name='🎁 Merry Christmas~', value=f'*{ctx.author.mention} {random.choice(pre)}\n'
+            emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}\n'
                                                             f'{random.choice(lose)}*')
         emb.set_footer(text=f'Rolled {roll:.2f} / 100 (Roll under {self.conf["chance"]} to win)',
                        icon_url='https://cdn.discordapp.com/attachments/231008480079642625/369344924556197889/1adc9faf91526bb7a2c1d0b7b3516cae.png')
@@ -141,4 +144,4 @@ class Christmas:
 
 
 def setup(bot):
-    bot.add_cog(Christmas(bot))
+    bot.add_cog(Raffle(bot))

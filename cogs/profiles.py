@@ -1,7 +1,7 @@
 import datetime
 import random
 from collections import defaultdict
-
+from .utils import time
 import aiohttp
 from discord.ext import commands
 import discord
@@ -100,6 +100,17 @@ class Profiles:
             ctx.profile.experience = xp
         await ctx.profile.save(self.bot.db)
         await ctx.send(f"{member} is now level {level}")
+
+    @commands.command(hidden=True)
+    async def profile(self, ctx):
+        member = ctx.author
+        e = discord.Embed(title=f'{member} (ID: {member.id})', colour=discord.Colour.green())
+        e.set_thumbnail(url=member.avatar_url_as(size=128))
+        e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
+        e.add_field(name=f'Created', value=time.time_ago(member.created_at), inline=True)
+        e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
+        e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
+        await ctx.send(embed=e)
 
     @commands.command(hidden=True)
     async def rank(self, ctx, member: discord.Member = None):
