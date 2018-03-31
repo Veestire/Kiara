@@ -175,7 +175,7 @@ class Moderation:
     async def bump(self, ctx, *, time_till_bump='6h'):
         """Tell kiara you bumped the server so she can remind you.
         Defaults to 6 hours if you leave the time out.
-        
+
         You can copy the exact time as shown on discord.me as time input, for example:
         ~bump 4h 21m 54s
         """
@@ -192,6 +192,12 @@ class Moderation:
                           description=f'Click [here](https://discord.me/server/bump-server/8742) for the bump page!')
         e.timestamp = datetime.datetime.utcnow()
         await ch.send(f"<@&407767148660916227>", embed=e)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def say(self, ctx, *, msg):
+        """Make Kiara say something"""
+        await ctx.send(msg)
 
 
 def setup(bot):
