@@ -197,6 +197,7 @@ class Moderation:
     @commands.has_permissions(administrator=True)
     async def say(self, ctx, *, msg):
         """Make Kiara say something"""
+        await ctx.message.delete()
         await ctx.send(msg)
 
 
