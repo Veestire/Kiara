@@ -54,29 +54,17 @@ class Raffle:
                 await self.bot.db.execute(
                     f'UPDATE cooldowns SET timestamp="{ctx.message.created_at}" WHERE user_id={ctx.author.id}')
         pre = [
-            'unwrapped their gift, and found...',
-            'put their hand inside the stocking, and pulled out...',
-            'opened a cardboard box, and pulled out...',
-            'got something thrown at them, it was...',
-            'got a present from a passerby, it contained...',
-            'found a suspicious looking box on the floor, it contained...'
+            'found an Easter gift, it was...'
         ]
         lose = [
-            'Coal… Lots of coal.',
-            'Soggy biscuits, did Santa leave them?',
-            f'A bag of chocolates!... Wait, they expired in {random.randrange(1900,2016)}.',
-            'A deep inner sadness.',
-            'A pair of socks.',
-            "A pair of kneesocks, but they don't fit.",
-            f'{random.randrange(10,100)} used matches.',
-            'Expired milk.'
+            'an empty egg wrapper... :('
         ]
         emb = discord.Embed(color=discord.Color(0xbdeefe))
         roll = random.uniform(0, 100)
         won = roll <= self.conf['chance']
         if won:
             emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}*\n'
-                                                            f'**A gift from santa, just for them!** 🌟')
+                                                            f'**A basket full of Easter goodies!** 🌟')
             await self.dm_owner(ctx.author)
         else:
             emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}\n'
@@ -127,7 +115,7 @@ class Raffle:
 
     @commands.command()
     async def raffleinfo(self, ctx):
-        emb = discord.Embed(color=discord.Color(0xfdd888), title='Raffle info')
+        emb = discord.Embed(color=discord.Color(0xbdeefe), title='Raffle info')
         emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
         emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
         emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
@@ -135,7 +123,7 @@ class Raffle:
 
     async def dm_owner(self, winner):
         owner = self.bot.get_user(73389450113069056)
-        emb = discord.Embed(color=discord.Color(0xfdd888), title='Raffle info')
+        emb = discord.Embed(color=discord.Color(0xbdeefe), title='Raffle info')
         emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
         emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
         emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
