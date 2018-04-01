@@ -88,7 +88,6 @@ class Profiles:
                 profile.experience -= needed
                 profile.coins += random.randint(1, 10)
 
-            print(f'{msg.author} is now Lv{profile.level}   {profile.experience}xp')
             await profile.save(self.bot.db)
             self.cooldowns[profile.user_id] = msg.created_at
 
@@ -118,7 +117,6 @@ class Profiles:
             profile.level = level
             if xp:
                 profile.experience = xp
-            print(f'command set level to {profile.level}')
             await profile.save(self.bot.db)
             await ctx.send(f"{member} is now level {level}")
 
@@ -183,7 +181,6 @@ class Profiles:
     def get_top_color(self, roles):
         excluded = ['Muted']
         for role in roles[::-1]:
-            print(role)
             if role.color != discord.Colour.default() and role.name not in excluded:
                 return role
         return None
