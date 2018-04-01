@@ -9,7 +9,7 @@ EXCLUDED_CHANNELS = []
 
 
 def exp_needed(level):
-    return level*100
+    return level*250
 
 
 def exp_total(level):
