@@ -88,7 +88,6 @@ class Moderation:
             await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests banning {member.mention}.")
             await ctx.send('Your ban request has been received.')
 
-
     @commands.command()
     @commands.has_any_role('Staff')
     async def unban(self, ctx, member: BannedMember, *, reason=None):
