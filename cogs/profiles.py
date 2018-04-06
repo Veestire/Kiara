@@ -42,7 +42,7 @@ class Profile:
         self.coins = kwargs.get('coins', 1)
 
     async def save(self, db):
-        s = ','.join([f'{s}={getattr(self,s,None)}' for s in self.__slots__[1:] if getattr(self, s, None)])
+        s = ','.join([f'{s}={getattr(self,s,None)}' for s in self.__slots__[1:] if getattr(self, s, None) is not None])
         await db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
 
     async def has_item(self, name=None):
