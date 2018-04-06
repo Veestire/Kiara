@@ -166,7 +166,7 @@ class Profiles:
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
-        output = '```\n'+'\n'.join([f"{int(rank)} - {guild.get_member(user_id).display_name} - Lv{lvl} {xp}/{exp_needed(lvl)}xp" for user_id, lvl, xp, rank in r])+'```'
+        output = '```\n'+'\n'.join([f"{int(rank)} - {getattr(guild.get_member(user_id),'display_name','user_left')} - Lv{lvl} {xp}/{exp_needed(lvl)}xp" for user_id, lvl, xp, rank in r])+'```'
         await ctx.send(output)
 
     @commands.command(hidden=True)
