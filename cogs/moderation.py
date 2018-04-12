@@ -189,7 +189,7 @@ class Moderation:
     async def on_bumpreminder_event(self):
         ch = self.bot.get_channel(BUMP_CHANNEL)
         e = discord.Embed(title="Server can be bumped!", colour=discord.Colour.purple(),
-                          description=f'Click [here](https://discord.me/server/bump-server/8742) for the bump page!')
+                          description=f'Click [here](https://discord.me/server/bump-servers/8742) for the bump page!')
         e.timestamp = datetime.datetime.utcnow()
         await ch.send(f"<@&407767148660916227>", embed=e)
 
