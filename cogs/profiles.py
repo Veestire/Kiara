@@ -93,7 +93,7 @@ class Profiles:
                     if role:
                         await msg.author.add_roles(role, reason=f"Reached level {profile.level}")
                         rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level-5, 1)))
-                        await msg.author.remove_roles(rem, eason=f"Reached level {profile.level}")
+                        await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
             await profile.save(self.bot.db)
             self.cooldowns[profile.user_id] = msg.created_at
