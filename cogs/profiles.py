@@ -38,8 +38,8 @@ class Profile:
     def __init__(self, uid, **kwargs):
         self.user_id = uid
         self.level = kwargs.get('level', 1)
-        self.experience = kwargs.get('experience', 1)
-        self.coins = kwargs.get('coins', 1)
+        self.experience = kwargs.get('experience', 0)
+        self.coins = kwargs.get('coins', 0)
 
     async def save(self, db):
         s = ','.join([f'{s}={getattr(self,s,None)}' for s in self.__slots__[1:] if getattr(self, s, None) is not None])
@@ -66,10 +66,10 @@ class Profiles:
         return Profile(uid, **profile)
 
     async def on_message(self, msg):
-        # if not msg.guild:
-        #     return
-        # if msg.channel.id in EXCLUDED_CHANNELS:
-        #     return
+        if not msg.guild:
+            return
+        if msg.channel.id in EXCLUDED_CHANNELS:
+            return
         if msg.author.bot:
             return
         async with self._lock:
@@ -88,8 +88,22 @@ class Profiles:
                 profile.experience -= needed
                 profile.coins += random.randint(1, 10)
 
+                if profile.level % 5 == 0:
+                    role = discord.utils.get(msg.guild.roles, name=str(profile.level))
+                    if role:
+                        await msg.author.add_roles(role, reason=f"Reached level {profile.level}")
+                        rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level-5, 1)))
+                        await msg.author.remove_roles(rem, eason=f"Reached level {profile.level}")
+
             await profile.save(self.bot.db)
             self.cooldowns[profile.user_id] = msg.created_at
+
+    async def on_member_join(self, member):
+        profile = await self.get_profile(member.id, ('level',))
+        role = discord.utils.get(member.guild.roles, name=str(profile.level//5*5))
+        if role:
+            await member.add_roles(role, reason=f"Re-joined the server at level {profile.level}")
+
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
