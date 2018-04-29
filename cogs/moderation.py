@@ -209,6 +209,53 @@ class Moderation:
         else:
             await ctx.send(msg)
 
+    @commands.group(invoke_without_command=True, aliases=['purge'])
+    @commands.has_permissions(manage_messages=True)
+    async def clear(self, ctx, amount: int = 10):
+        """Clear messages in a channel"""
+        amount = max(1, min(amount, 50))
+        messages = await ctx.channel.history(limit=amount+1).flatten()
+        await ctx.channel.delete_messages(messages)
+        await ctx.send(f'Deleted {len(messages)} messages', delete_after=4)
+
+    @clear.command(name="member", aliases=['user'])
+    @commands.has_permissions(manage_messages=True)
+    async def clear_member(self, ctx, member: discord.Member, amount: int = 10):
+        """Clear messages from a specific user"""
+        messages = await ctx.channel.history(limit=amount+1).filter(lambda m: m.author.id==member.id).flatten()
+
+        await ctx.channel.delete_messages(messages)
+        await ctx.send(f'Deleted {len(messages)} messages', delete_after=4)
+
+    @clear.command(name="nonimage", aliases=['text'])
+    @commands.has_permissions(manage_messages=True)
+    async def clear_nonimage(self, ctx, amount: int = 10):
+        """Clear messages without attachments"""
+        def check(message):
+            if message.embeds:
+                data = message.embeds[0]
+                if data.type == 'image':
+                    return False
+                if data.type == 'rich':
+                    return False
+
+            if message.attachments:
+                return False
+            return True
+
+        messages = await ctx.channel.history(limit=amount+1).filter(check).flatten()
+
+        await ctx.channel.delete_messages(messages)
+        await ctx.send(f'Deleted {len(messages)} messages', delete_after=4)
+
+    @clear.command(name="bot")
+    @commands.has_permissions(manage_messages=True)
+    async def clear_bot(self, ctx, amount: int = 10):
+        """Clear bot messages"""
+        messages = await ctx.channel.history(limit=amount+1).filter(lambda m: m.author.bot).flatten()
+
+        await ctx.channel.delete_messages(messages)
+        await ctx.send(f'Deleted {len(messages)} messages', delete_after=4)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
