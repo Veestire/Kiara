@@ -92,7 +92,8 @@ class Monitor:
 
     @deletes.command(name='from')
     @commands.has_role('Staff')
-    async def deletes_from(self, ctx, member: discord.Member):
+    async def deletes_from(self, ctx, member: MemberID):
+        member = await self.bot.get_user_info(member)
         qry = f'SELECT content, attachments FROM monitorlog WHERE type="delete" AND user_id={member.id} ' \
               f'ORDER BY id DESC'
         rows = await self.bot.db.fetch(qry)
