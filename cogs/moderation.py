@@ -1,5 +1,7 @@
 import datetime
 
+from io import BytesIO
+
 from .utils import time
 from discord.ext import commands
 import parsedatetime as pdt
@@ -198,7 +200,14 @@ class Moderation:
     async def say(self, ctx, *, msg):
         """Make Kiara say something"""
         await ctx.message.delete()
-        await ctx.send(msg)
+        if ctx.message.attachments:
+            file = BytesIO()
+            att = ctx.message.attachments[0]
+            await att.save(file)
+            file.seek(0)
+            await ctx.send(msg, file=discord.File(file, filename=att.filename))
+        else:
+            await ctx.send(msg)
 
 
 def setup(bot):
