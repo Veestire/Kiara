@@ -197,7 +197,7 @@ class Moderation:
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def say(self, ctx, *, msg):
+    async def say(self, ctx, *, msg=None):
         """Make Kiara say something"""
         await ctx.message.delete()
         if ctx.message.attachments:
