@@ -199,7 +199,7 @@ class Profiles:
                 return role
         return None
 
-    @commands.command(hidden=True, aliases=['buy'])
+    @commands.command(hidden=True, aliases=['buy', 'colours'])
     async def colors(self, ctx, *, color=None):
         # This is mostly temporary until shop data and items are stored in the database
         colors = {
