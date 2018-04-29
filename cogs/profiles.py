@@ -59,7 +59,7 @@ class Profiles:
 
     async def get_profile(self, uid, keys=None):
         s = ', '.join(keys)
-        profile = await self.bot.db.fetchdict(f'SELECT {s or "*"} FROM profiles WHERE user_id={uid}')
+        profile = await self.bot.db.fetchdict(f'SELECT * FROM profiles WHERE user_id={uid}')
         if not profile:
             await self.bot.db.execute(f'INSERT INTO profiles (user_id) VALUES ("{uid}")')
             return Profile(uid, level=1, experience=0, coins=0)
