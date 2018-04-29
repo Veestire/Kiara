@@ -167,7 +167,7 @@ class Profiles:
         await ctx.send(embed=em)
 
     @commands.command(hidden=True, aliases=['leaderboards', 'ranks', 'rankings'])
-    async def leaderboard(self, ctx):
+    async def leaderboard(self, ctx, page: int=1):
         guild = self.bot.get_guild(215424443005009920)
         qry = f"""
         select `user_id`, `level`, `experience`, `rank` FROM
@@ -177,9 +177,9 @@ class Profiles:
         (select @r := 0) r
         order by `level` desc, `experience` desc
         ) as t
-        limit 10
+        limit %s, %s
         """
-        r = await ctx.bot.db.fetch(qry)
+        r = await ctx.bot.db.fetch(qry, ((page-1)*10, 10))
         w = max(len(getattr(guild.get_member(user_id), 'display_name', 'user_left')) for user_id, lvl, xp, rank in r)
         output = '```\n'+'\n'.join([f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - Lv{lvl:<4} {xp:<5} / {exp_needed(lvl):>5}xp" for user_id, lvl, xp, rank in r])+'```'
         await ctx.send(output)
