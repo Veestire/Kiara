@@ -162,11 +162,11 @@ class Profiles:
         where `user_id`={member.id}
         """
         lvl, xp, rank = await ctx.bot.db.fetchone(qry)
-        em = discord.Embed(title=f'**{member.display_name}**',
-                           description=f'**Rank {rank} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
+        em = discord.Embed(title=f'**{member.display_name}**', color=0x77dd77,
+                           description=f'**Rank {round(rank)} - Lv{lvl}** {xp}/{exp_needed(lvl)}xp')
         await ctx.send(embed=em)
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['leaderboards', 'ranks', 'rankings'])
     async def leaderboard(self, ctx):
         guild = self.bot.get_guild(215424443005009920)
         qry = f"""
@@ -180,16 +180,20 @@ class Profiles:
         limit 10
         """
         r = await ctx.bot.db.fetch(qry)
-        output = '```\n'+'\n'.join([f"{int(rank)} - {getattr(guild.get_member(user_id),'display_name','user_left')} - Lv{lvl} {xp}/{exp_needed(lvl)}xp" for user_id, lvl, xp, rank in r])+'```'
+        w = max(len(getattr(guild.get_member(user_id), 'display_name', 'user_left')) for user_id, lvl, xp, rank in r)
+        output = '```\n'+'\n'.join([f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - Lv{lvl:<4} {xp:<5} / {exp_needed(lvl):>5}xp" for user_id, lvl, xp, rank in r])+'```'
         await ctx.send(output)
 
-    @commands.command(hidden=True)
-    async def xp(self, ctx, member: discord.Member = None):
+    @commands.command(aliases=['experience'])
+    async def xp(self, ctx, *, member: discord.Member = None):
+        """Shows your exp"""
         if not member:
             member = ctx.author
         p = await self.get_profile(member.id, ('level', 'experience'))
-        em = discord.Embed(title=f'**{member}**',
-                           description=f'**Lv{p.level}** {p.experience}/{exp_needed(p.level)}xp')
+        em = discord.Embed(title=f'{member.display_name}', colour=0x77dd77)
+        em.add_field(name="Level", value=f'**{p.level}**')
+        em.add_field(name="Exp", value=f'{p.experience}/{exp_needed(p.level)}xp')
+        em.set_thumbnail(url=member.avatar_url_as(size=64))
         await ctx.send(embed=em)
 
     def get_top_color(self, roles):
