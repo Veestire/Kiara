@@ -36,7 +36,7 @@ class Monitor:
     @commands.has_any_role('Staff')
     async def monitor_list(self, ctx):
         if self.logged_users:
-            await ctx.send('Users currently getting logged:\n'+'\n'.join([self.bot.get_user(u) or u for u in self.logged_users]))
+            await ctx.send('Users currently getting logged:\n'+'\n'.join([str(self.bot.get_user(u)) or u for u in self.logged_users]))
         else:
             await ctx.send('No users are getting logged atm.')
 
