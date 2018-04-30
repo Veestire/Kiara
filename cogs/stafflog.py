@@ -18,7 +18,7 @@ class Stafflog:
         ch = self.bot.get_channel(LOG_CHANNEL)
         msg = await ch.send('Case')
         _, c_id = await self.bot.db.execute(f'INSERT INTO stafflog (message_id, user_id, action, reason, date) '
-                                            f'VALUES ({msg.id}, {user.id}, "{action}", "{reason}", "{date}")')
+                                            f'VALUES (%s,%s,%s,%s,%s)', (msg.id, user.id, action, reason, date))
 
         if reason is None:
             reason = f'`~reason {c_id} [reason]`'
