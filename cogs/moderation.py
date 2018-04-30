@@ -174,7 +174,7 @@ class Moderation:
 
     @commands.command(aliases=['bumped'])
     @commands.has_role('Staff')
-    async def bump(self, ctx, *, time_till_bump='6h'):
+    async def bump(self, ctx, *, time_till_bump='5h 59m'):
         """Tell kiara you bumped the server so she can remind you.
         Defaults to 6 hours if you leave the time out.
 
