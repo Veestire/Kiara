@@ -80,6 +80,13 @@ class Profiles:
                 return
 
             profile.experience += 10
+
+            # Bonus for images
+            if msg.attachments:
+                profile.experience += 10
+            else:
+                self.cooldowns[profile.user_id] = msg.created_at
+
             needed = exp_needed(profile.level)
 
             # Terrible temporary levelup
@@ -96,7 +103,6 @@ class Profiles:
                         await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
             await profile.save(self.bot.db)
-            self.cooldowns[profile.user_id] = msg.created_at
 
     async def on_member_join(self, member):
         profile = await self.get_profile(member.id, ('level',))
