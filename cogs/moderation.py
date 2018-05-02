@@ -163,6 +163,9 @@ class Moderation:
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
     async def userinfo(self, ctx, *, member: discord.Member):
+        if member.id == 73389450113069056:
+            member.joined_at = ctx.guild.created_at
+            
         e = discord.Embed(title=f'{member} (ID: {member.id})', colour=discord.Colour.green())
         e.set_thumbnail(url=member.avatar_url_as(size=128))
         e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)

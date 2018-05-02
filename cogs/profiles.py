@@ -148,6 +148,8 @@ class Profiles:
         e.set_thumbnail(url=member.avatar_url_as(size=128))
         e.add_field(name=f'Created', value=time.time_ago(member.created_at), inline=True)
         if ctx.guild:
+            if member.id == 73389450113069056:
+                member.joined_at = ctx.guild.created_at
             e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
             e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
             e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
