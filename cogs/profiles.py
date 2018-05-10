@@ -205,7 +205,7 @@ class Profiles:
         await ctx.send(embed=em)
 
     def get_top_color(self, roles):
-        excluded = ['Muted']
+        excluded = ['Muted', 'Guardian Angel']
         for role in roles[::-1]:
             if role.color != discord.Colour.default() and role.name not in excluded:
                 return role
