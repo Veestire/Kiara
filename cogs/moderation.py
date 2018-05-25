@@ -202,7 +202,6 @@ class Moderation:
     @commands.has_permissions(administrator=True)
     async def say(self, ctx, *, msg=None):
         """Make Kiara say something"""
-        await ctx.message.delete()
         if ctx.message.attachments:
             file = BytesIO()
             att = ctx.message.attachments[0]
@@ -211,6 +210,7 @@ class Moderation:
             await ctx.send(msg, file=discord.File(file, filename=att.filename))
         else:
             await ctx.send(msg)
+        await ctx.message.delete()
 
     @commands.group(invoke_without_command=True, aliases=['purge'])
     @commands.has_permissions(manage_messages=True)
