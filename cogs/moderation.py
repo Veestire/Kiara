@@ -60,11 +60,12 @@ class Moderation:
 
     @commands.command()
     @commands.has_any_role('Staff')
-    async def kick(self, ctx, member: discord.Member, *, reason=None):
+    async def kick(self, ctx, member: MemberID, *, reason=None):
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'kick_members', None):
             try:
-                await ctx.guild.kick(member, reason=reason)
+                await ctx.guild.kick(discord.Object(id=member), reason=reason)
+                member = await self.bot.get_user_info(member)
                 await ctx.send(f'Kicked {member}!')
             except Exception as e:
                 await ctx.send(e)
@@ -201,7 +202,6 @@ class Moderation:
     @commands.has_permissions(administrator=True)
     async def say(self, ctx, *, msg=None):
         """Make Kiara say something"""
-        await ctx.message.delete()
         if ctx.message.attachments:
             file = BytesIO()
             att = ctx.message.attachments[0]
@@ -210,6 +210,7 @@ class Moderation:
             await ctx.send(msg, file=discord.File(file, filename=att.filename))
         else:
             await ctx.send(msg)
+        await ctx.message.delete()
 
     @commands.group(invoke_without_command=True, aliases=['purge'])
     @commands.has_permissions(manage_messages=True)
