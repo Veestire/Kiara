@@ -1,6 +1,8 @@
+import asyncio
 import random
-from collections import OrderedDict
 from enum import Enum
+
+import itertools
 
 import discord
 from discord.ext import commands
@@ -37,10 +39,11 @@ extra_colors = [
 
 
 class Shop:
-    __slots__ = ('name', 'items')
+    __slots__ = ('name', 'description', 'items')
 
-    def __init__(self, name):
+    def __init__(self, name, description=None):
         self.name = name
+        self.description = description
         self.items = []
 
     def add(self, item):
@@ -67,6 +70,9 @@ class Item:
     def get_role(self):
         return 0
 
+    def __repr__(self):
+        return f"<Item name='{self.name} type={self.type} cost={self.cost} data={self.data}>"
+
 
 class Economy:
 
@@ -74,8 +80,8 @@ class Economy:
         self.bot = bot
         self.profiles = bot.get_cog("Profiles")
         self.shops = [
-            Shop('Role shop'),
-            Shop('Premium shop')
+            Shop('Role shop', 'You can buy common colors here'),
+            Shop('Premium shop', 'You can buy premium colors here')
         ]
         for name, data, cost in base_colors:
             self.shops[0].add(Item(name, ItemType.ROLE, cost=cost, data=data))
@@ -95,28 +101,76 @@ class Economy:
     async def dailies_error(self, ctx, error):
         m, s = divmod(error.retry_after, 60)
         h, m = divmod(m, 60)
-        msg = "You can use this command once per 24 hours.\nTry again in "
-        if h:
-            msg += f"{h} hour(s)"
-        elif m:
-            msg += f"{m} minutes and {s} seconds"
-        else:
-            msg += f"{s} seconds"
+
+        t = f"{h:.0f} hour(s)" if h else f"{m:.0f} minute(s) and {s:.0f} second(s)" if m else f"{s:.0f} second(s)"
+        msg = "You already collected your dailies.\nTry again in " + t
+
         await ctx.send(msg)
 
+    async def get_owned_colors(self, user_id):
+        owned = itertools.chain(*await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user_id}'))
+        return list(owned)
+
     @commands.command(hidden=True)
+    # @commands.guild_only()
     async def shop(self, ctx, *, name=None):
+        """Check out the shop"""
+        owned = await self.get_owned_colors(ctx.author.id)
+        profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
+
         em = discord.Embed(title="Color shop~", description="You can buy your colors here. To buy, type `~buy [color]`")
         for shop in self.shops:
             for item in shop.items:
-                em.add_field(name=f'{item.name}', value=f"{item.cost}g")
-        em.set_footer(text=f"You have x gold")
+                text = f"<@&{item.data}>\n"
+                price = "Bought~" if item.data in owned else f"{item.cost}g"
+                em.add_field(name=f'\u200b', value=text+price)
+        em.set_footer(text=f"You have {profile.coins} gold")
         await ctx.send(embed=em)
 
     @commands.command(hidden=True)
-    async def buy(self, ctx, *, item):
+    async def buy(self, ctx, *, item_name):
+        """Buy an item from the shop"""
+        item_name = item_name.lower()
+        for shop in self.shops:
+            item = discord.utils.find(lambda x: item_name in x.name.lower(), shop.items)
+            if item:
+                break
+        else:
+            return await ctx.send(f"{item} is not a valid item.")
 
-        pass
+        owned = await self.get_owned_colors(ctx.author.id)
+
+        # TODO: Handle non role items
+        if item.data not in owned:
+            async with self.profiles.get_lock(ctx.author.id):
+                profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
+                if profile.coins >= item.cost:
+                    profile.coins -= item.cost
+                    await ctx.send(f"Thanks for buying <@&{item.data}>!")
+                else:
+                    return await ctx.send(f"You don't have enough gold for <@&{item.data}>")
+                await profile.save(self.bot.db)
+            await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({ctx.author.id}, {item.data})')
+        else:
+            await ctx.send(f"I'll swap your color to <@&{item.data}>")
+
+        topcolor = self.profiles.get_top_color(ctx.author.roles)
+        if topcolor:
+            await ctx.author.remove_roles(topcolor)
+
+        role = discord.utils.get(ctx.guild.roles, id=item.data)
+        await ctx.author.add_roles(role)
+
+    @commands.guild_only()
+    @commands.command(aliases=['colors'])
+    async def colours(self, ctx):
+        """Display your owned colors"""
+        owned = await self.get_owned_colors(ctx.author.id)
+        if owned:
+            await ctx.send("You own the following colors:\n"+'\n'.join([f"<@&{role}>" for role in owned]))
+        else:
+            await ctx.send("You don't own any colors at the moment.")
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))
