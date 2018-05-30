@@ -151,7 +151,7 @@ class Profiles:
     async def profile(self, ctx):
         """Display your profile"""
         member = ctx.author
-        e = discord.Embed(title=member.display_name, colour=discord.Colour.green())
+        e = discord.Embed(title=member.display_name)
         e.set_thumbnail(url=member.avatar_url_as(size=128))
         e.add_field(name=f'Created', value=time.time_ago(member.created_at), inline=True)
         if ctx.guild:
@@ -160,6 +160,10 @@ class Profiles:
             e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
             e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
             e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
+
+            role = self.get_top_color(member.roles) if ctx.guild else None
+            if role:
+                e.colour = role.color
         await ctx.send(embed=e)
 
     @commands.command(hidden=True)
@@ -205,10 +209,15 @@ class Profiles:
         if not member:
             member = ctx.author
         p = await self.get_profile(member.id, ('level', 'experience'))
-        em = discord.Embed(title=f'{member.display_name}', colour=0x77dd77)
+        em = discord.Embed(title=f'{member.display_name}')
         em.add_field(name="Level", value=f'**{p.level}**')
         em.add_field(name="Exp", value=f'{p.experience}/{exp_needed(p.level)}xp')
         em.set_thumbnail(url=member.avatar_url_as(size=64))
+
+        role = self.get_top_color(member.roles)
+        if role:
+            em.colour = role.color
+
         await ctx.send(embed=em)
 
     def get_top_color(self, roles):
