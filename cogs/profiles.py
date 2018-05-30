@@ -227,57 +227,6 @@ class Profiles:
                 return role
         return None
 
-    @commands.command(hidden=True, aliases=['buy', 'colours'])
-    async def colors(self, ctx, *, color=None):
-        # This is mostly temporary until shop data and items are stored in the database
-        colors = {
-            "Red":      424579184216506368,
-            "Yellow":   424579315066208276,
-            "Green":    424579385983762432,
-            "Orange":   424579446578872332,
-            "Cyan":     424579523363733507,
-            "Blue":     424579641802752000,
-            "Purple":   424579707573633024,
-            "Pink":     424579770240466951,
-            "Charcoal": 424579833994149888,
-        }
-
-        if color:
-            color = color.capitalize()
-            if color not in colors:
-                return await ctx.send(f"{color} is not a valid color")
-
-        owned = await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={ctx.author.id}') or ((1,),)
-        owned = [x[0] for x in owned]
-
-        async with self.get_lock(ctx.author.id):
-            profile = await self.get_profile(ctx.author.id, ('coins',))
-            if color:
-                if colors[color] not in owned:
-                    if profile.coins >= 30:
-                        profile.coins -= 30
-                        await profile.save(self.bot.db)
-                    else:
-                        return await ctx.send(f"You don't have enough gold ({profile.coins}g)")
-                    await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({ctx.author.id}, {colors[color]})')
-
-                topcolor = self.get_top_color(ctx.author.roles)
-                if topcolor:
-                    await ctx.author.remove_roles(topcolor)
-
-                role = discord.utils.get(ctx.guild.roles, id=colors[color])
-                await ctx.author.add_roles(role)
-                if colors[color] in owned:
-                    await ctx.send(f"I swapped your color to {role.mention}!")
-                else:
-                    await ctx.send(f"You bought {role.mention}! You have {profile.coins}g left")
-            else:
-                em = discord.Embed(title="Color shop~", description="You can buy your colors here. To buy, type `~buy [color]`")
-                for k, v in colors.items():
-                    em.add_field(name=f'{k}', value="[Owned]" if v in owned else "30g")
-                em.set_footer(text=f"You have {profile.coins} gold")
-                await ctx.send(embed=em)
-
 
 def setup(bot):
     bot.add_cog(Profiles(bot))
