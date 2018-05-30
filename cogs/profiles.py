@@ -159,7 +159,7 @@ class Profiles:
                 member.joined_at = ctx.guild.created_at
             e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
             e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
-            e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
+            e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[:0:-1]]), inline=False)
 
             role = self.get_top_color(member.roles) if ctx.guild else None
             if role:
