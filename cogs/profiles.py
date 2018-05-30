@@ -55,7 +55,14 @@ class Profiles:
     def __init__(self, bot):
         self.bot = bot
         self.cooldowns = {}
-        self._lock = asyncio.Lock(loop=bot.loop)
+        self._locks = dict()
+
+    def get_lock(self, name):
+        lock = self._locks.get(name)
+        if not lock:
+            lock = asyncio.Lock(loop=self.bot.loop)
+            self._locks[name] = lock
+        return lock
 
     async def get_profile(self, uid, keys=None):
         s = ', '.join(keys)
@@ -72,7 +79,7 @@ class Profiles:
             return
         if msg.author.bot:
             return
-        async with self._lock:
+        async with self.get_lock(msg.author.id):
             profile = await self.get_profile(msg.author.id, ('level', 'experience', 'coins'))
 
             d = abs(msg.created_at - self.cooldowns.get(profile.user_id, datetime.datetime(2000, 1, 1)))
@@ -114,7 +121,7 @@ class Profiles:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def givegold(self, ctx, member: discord.Member, gold: int):
-        async with self._lock:
+        async with self.get_lock(ctx.author.id):
             profile = await self.get_profile(member.id, ['coins'])
             profile.coins += gold
             await profile.save(self.bot.db)
@@ -123,7 +130,7 @@ class Profiles:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def takegold(self, ctx, member: discord.Member, gold: int):
-        async with self._lock:
+        async with self.get_lock(ctx.author.id):
             profile = await self.get_profile(member.id, ['coins'])
             profile.coins -= gold
             await profile.save(self.bot.db)
@@ -132,7 +139,7 @@ class Profiles:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def setlevel(self, ctx, member: discord.Member, level: int, xp: int= None):
-        async with self._lock:
+        async with self.get_lock(ctx.author.id):
             profile = await self.get_profile(member.id, ['level'])
             profile.level = level
             if xp:
@@ -234,7 +241,7 @@ class Profiles:
         owned = await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={ctx.author.id}') or ((1,),)
         owned = [x[0] for x in owned]
 
-        async with self._lock:
+        async with self.get_lock(ctx.author.id):
             profile = await self.get_profile(ctx.author.id, ('coins',))
             if color:
                 if colors[color] not in owned:
