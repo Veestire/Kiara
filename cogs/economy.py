@@ -89,6 +89,7 @@ class Economy:
             self.shops[1].add(Item(name, ItemType.ROLE, cost=cost, data=data))
 
     @commands.cooldown(1, 86400, commands.BucketType.user)
+    @commands.guild_only()
     @commands.command(aliases=['daily'])
     async def dailies(self, ctx):
         amount = random.randint(1, 5)
@@ -111,8 +112,8 @@ class Economy:
         owned = itertools.chain(*await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user_id}'))
         return list(owned)
 
+    @commands.guild_only()
     @commands.command(hidden=True)
-    # @commands.guild_only()
     async def shop(self, ctx, *, name=None):
         """Check out the shop"""
         owned = await self.get_owned_colors(ctx.author.id)
@@ -127,6 +128,7 @@ class Economy:
         em.set_footer(text=f"You have {profile.coins} gold")
         await ctx.send(embed=em)
 
+    @commands.guild_only()
     @commands.command(hidden=True)
     async def buy(self, ctx, *, item_name):
         """Buy an item from the shop"""
