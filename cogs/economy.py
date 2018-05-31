@@ -113,9 +113,11 @@ class Economy:
         return list(owned)
 
     @commands.guild_only()
-    @commands.command(hidden=True)
+    @commands.group(hidden=True, invoke_without_command=True)
     async def shop(self, ctx, *, name=None):
         """Check out the shop"""
+        if ctx.invoked_subcommand is not None:
+            return
         owned = await self.get_owned_colors(ctx.author.id)
         profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
 
@@ -128,17 +130,26 @@ class Economy:
         em.set_footer(text=f"You have {profile.coins} gold")
         await ctx.send(embed=em)
 
+    @shop.command(name="reload")
+    async def shop_reload(self, ctx):
+        pass
+
     @commands.guild_only()
     @commands.command(hidden=True)
     async def buy(self, ctx, *, item_name):
         """Buy an item from the shop"""
         item_name = item_name.lower()
+        role = discord.utils.find(lambda x: item_name in x.name.lower(), ctx.guild.roles)
+
+        if not role:
+            return await ctx.send(f"{item_name} is not a valid role.")
+
         for shop in self.shops:
-            item = discord.utils.find(lambda x: item_name in x.name.lower(), shop.items)
+            item = discord.utils.find(lambda x: role.id == x.data, shop.items)
             if item:
                 break
         else:
-            return await ctx.send(f"{item} is not a valid item.")
+            return await ctx.send(f"{role.name} is not for sale.")
 
         owned = await self.get_owned_colors(ctx.author.id)
 
@@ -172,6 +183,13 @@ class Economy:
             await ctx.send("You own the following colors:\n"+'\n'.join([f"<@&{role}>" for role in owned]))
         else:
             await ctx.send("You don't own any colors at the moment.")
+
+    def init_shop(self):
+        self.shops = [
+            Shop('Role shop', 'You can buy colours here')
+        ]
+        for name, data, cost in base_colors+extra_colors:
+            self.shops[0].add(Item(name, ItemType.ROLE, cost=cost, data=data))
 
 
 def setup(bot):
