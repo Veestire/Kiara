@@ -93,9 +93,10 @@ class Economy:
     @commands.command(aliases=['daily'])
     async def dailies(self, ctx):
         amount = random.randint(1, 5)
-        profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
-        profile.coins += amount
-        await profile.save(self.bot.db)
+        async with self.profiles.get_lock(ctx.author.id):
+            profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
+            profile.coins += amount
+            await profile.save(self.bot.db)
         await ctx.send(f"You got {amount} gold as daily reward.")
 
     @dailies.error
