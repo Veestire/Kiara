@@ -191,6 +191,47 @@ class Economy:
         for name, data, cost in base_colors+extra_colors:
             self.shops[0].add(Item(name, ItemType.ROLE, cost=cost, data=data))
 
+    @commands.guild_only()
+    @commands.command(aliases=['wallet', 'gold', 'money', 'coins'])
+    async def balance(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        profile = await self.profiles.get_profile(member.id, ('coins',))
+
+        await ctx.send(embed=discord.Embed(title=f"{member.display_name} has {profile.coins} gold"))
+
+    @commands.guild_only()
+    @commands.command(aliases=['sendmoney', 'pay', 'tip'])
+    async def givemoney(self, ctx, receiver: discord.Member = None, amount: int = 0):
+        if receiver is None:
+            return await ctx.send("I don't know who you want to give money to.")
+        if amount <= 0:
+            return await ctx.send('Please provide an amount above 0.')
+
+        sender = await self.profiles.get_profile(ctx.author.id, ('coins',))
+
+        if sender.coins < amount:
+            return await ctx.send("You don't have enough gold to transfer that much.")
+
+        await ctx.send(f"Please confirm you want to transfer {amount}g to {receiver}. `yes / no`")
+        response = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id)
+
+        if 'y' in response.content:
+            async with self.profiles.get_lock(ctx.author.id):
+                sender = await self.profiles.get_profile(ctx.author.id, ('coins',))
+                if sender.coins < amount:
+                    return await ctx.send("You somehow don't have the funds to do this anymore.")
+                sender.coins -= amount
+                await sender.save(self.bot.db)
+            async with self.profiles.get_lock(receiver.id):
+                taker = await self.profiles.get_profile(receiver.id, ('coins',))
+                taker.coins += amount
+                await taker.save(self.bot.db)
+            await ctx.send(f"You sent {receiver} {amount}g.")
+        else:
+            return await ctx.send("Transfer cancelled.")
+
 
 def setup(bot):
     bot.add_cog(Economy(bot))
