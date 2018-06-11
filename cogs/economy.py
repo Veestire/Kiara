@@ -218,7 +218,7 @@ class Economy:
         await ctx.send(f"Please confirm you want to transfer {amount}g to {receiver}. `yes / no`")
         response = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id)
 
-        if 'y' in response.content:
+        if 'y' in response.content.lower():
             async with self.profiles.get_lock(ctx.author.id):
                 sender = await self.profiles.get_profile(ctx.author.id, ('coins',))
                 if sender.coins < amount:
