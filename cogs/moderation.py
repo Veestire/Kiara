@@ -14,6 +14,8 @@ STAFF_CHANNEL = 231008480079642625
 MUTED_ROLE = 348331525479071745
 BUMP_CHANNEL = 407581915726610443
 
+INVITE_REGEX = "(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+"
+
 def get_date(text):
     cal = pdt.Calendar()
     time, res = cal.parseDT(text, datetime.datetime.utcnow())
