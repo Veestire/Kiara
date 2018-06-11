@@ -215,7 +215,7 @@ class Economy:
         if sender.coins < amount:
             return await ctx.send("You don't have enough gold to transfer that much.")
 
-        await ctx.send(f"Please confirm you want to transfer {amount}g to {receiver}. `yes / no`")
+        await ctx.send(embed=discord.Embed(description=f"Are you sure you want to send {amount}g to {receiver}? `y / n`"))
         response = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id)
 
         if 'y' in response.content.lower():
@@ -229,7 +229,7 @@ class Economy:
                 taker = await self.profiles.get_profile(receiver.id, ('coins',))
                 taker.coins += amount
                 await taker.save(self.bot.db)
-            await ctx.send(f"You sent {receiver} {amount}g.")
+            await ctx.send(embed=discord.Embed(description=f"You sent {receiver} {amount}g."))
         else:
             return await ctx.send("Transfer cancelled.")
 
