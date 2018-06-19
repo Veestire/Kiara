@@ -227,5 +227,13 @@ class Admin:
             await self.bot.process_commands(msg)
             await asyncio.sleep(1)
 
+    @commands.command(hidden=True)
+    async def runas(self, ctx, user: discord.User, *, command):
+        msg = copy.copy(ctx.message)
+        msg.content = command
+        msg.author = user
+
+        await self.bot.process_commands(msg)
+
 def setup(bot):
     bot.add_cog(Admin(bot))
