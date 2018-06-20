@@ -5,13 +5,17 @@ import traceback
 import discord
 from discord.ext import commands
 import aiohttp
+import aioredis
 
-import config
+from cogs.utils.config import Config
 from cogs.utils.db import DB
 
 desc = 'A personal bot for Waifu Worshipping'
 
-class Rub(commands.Bot):
+config = Config()
+
+
+class Kiara(commands.Bot):
 
     def __init__(self):
         super().__init__(command_prefix=config.prefix, description=desc, pm_help=None, help_attrs=dict(hidden=True),
@@ -19,6 +23,7 @@ class Rub(commands.Bot):
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.db = DB(config.db_host, config.db_user, config.db_pass, 'rub', self.loop)
+        self.redis = self.loop.run_until_complete(aioredis.create_connection('redis://redis', loop=self.loop))
 
     def load_cogs(self):
         for cog in config.cogs:
@@ -52,12 +57,12 @@ class Rub(commands.Bot):
 
     @property
     def config(self):
-        return __import__('config')
+        return config
 
     def run(self):
         super().run(config.token)
 
 
 if __name__ == '__main__':
-    rub = Rub()
+    rub = Kiara()
     rub.run()
