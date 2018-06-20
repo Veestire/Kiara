@@ -22,11 +22,11 @@ class Kiara(commands.Bot):
                          game=discord.Game(name='~help'))
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
-        self.db = DB(config.db_host, config.db_user, config.db_pass, 'rub', self.loop)
+        self.db = DB(config.MYSQL_HOST, config.MYSQL_USER, config.MYSQL_PASSWORD, config.MYSQL_DATABASE, self.loop)
         self.redis = self.loop.run_until_complete(aioredis.create_connection('redis://redis', loop=self.loop))
 
     def load_cogs(self):
-        for cog in config.cogs:
+        for cog in config.base_cogs:
             try:
                 self.load_extension(cog)
             except Exception as e:
