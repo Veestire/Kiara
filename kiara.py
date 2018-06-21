@@ -42,6 +42,14 @@ class Kiara(commands.Bot):
     async def on_resumed(self):
         print('Resumed..')
 
+    async def process_commands(self, message):
+        ctx = await self.get_context(message, cls=context.Context)
+
+        if ctx.command is None:
+            return
+
+        await self.invoke(ctx)
+
     async def on_command_error(self, ctx, error):
         # TODO: Add extra error handling
         if isinstance(error, commands.NoPrivateMessage):
