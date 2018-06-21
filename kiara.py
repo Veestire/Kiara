@@ -72,5 +72,5 @@ class Kiara(commands.Bot):
 
 
 if __name__ == '__main__':
-    rub = Kiara()
-    rub.run()
+    kiara = Kiara()
+    kiara.run()
