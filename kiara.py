@@ -26,7 +26,7 @@ class Kiara(commands.Bot):
         self.redis = self.loop.run_until_complete(aioredis.create_connection('redis://redis', loop=self.loop))
 
     def load_cogs(self):
-        for cog in config.base_cogs:
+        for cog in config.base_cogs.split():
             try:
                 self.load_extension(cog)
             except Exception as e:
