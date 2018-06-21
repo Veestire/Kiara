@@ -7,8 +7,8 @@ from discord.ext import commands
 import aiohttp
 import aioredis
 
+from cogs.utils import context, db
 from cogs.utils.config import Config
-from cogs.utils.db import DB
 
 desc = 'A personal bot for Waifu Worshipping'
 
@@ -22,8 +22,8 @@ class Kiara(commands.Bot):
                          game=discord.Game(name='~help'))
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
-        self.db = DB(config.MYSQL_HOST, config.MYSQL_USER, config.MYSQL_PASSWORD, config.MYSQL_DATABASE, self.loop)
-        self.redis = self.loop.run_until_complete(aioredis.create_connection('redis://redis', loop=self.loop))
+        self.db = db.DB(config.MYSQL_HOST, config.MYSQL_USER, config.MYSQL_PASSWORD, config.MYSQL_DATABASE, self.loop)
+        self.redis = self.loop.run_until_complete(aioredis.create_redis_pool('redis://redis', loop=self.loop))
 
     def load_cogs(self):
         for cog in config.base_cogs.split():
