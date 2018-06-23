@@ -59,6 +59,8 @@ class Kiara(commands.Bot):
             pass
         elif isinstance(error, commands.BadArgument):
             await ctx.send(error)
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send("Please wait before using this command again.")
         elif isinstance(error, commands.CommandInvokeError):
             print(f'In {ctx.command.qualified_name}:', file=sys.stderr)
             traceback.print_tb(error.original.__traceback__)
