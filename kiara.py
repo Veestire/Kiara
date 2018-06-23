@@ -24,6 +24,7 @@ class Kiara(commands.Bot):
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.db = db.DB(config.MYSQL_HOST, config.MYSQL_USER, config.MYSQL_PASSWORD, config.MYSQL_DATABASE, self.loop)
         self.redis = self.loop.run_until_complete(aioredis.create_redis_pool('redis://redis', loop=self.loop))
+        self.redis = aioredis.Redis(self.redis)
 
     def load_cogs(self):
         for cog in config.base_cogs.split():
