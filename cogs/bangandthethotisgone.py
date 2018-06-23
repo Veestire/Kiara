@@ -40,16 +40,16 @@ class Begone:
     @begone_manage.command()
     async def list_images(self, ctx, member_id='0'):
         #Simple Query to obtain all images related to the specified member_id
-        r = await self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`={member_id}')
+        r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`={member_id}')
         for item in range(len(r)):
-            await ctx.send(f"Image ID: {r[item]['ID']}\n"
+            await ctx.send(f"Image ID: {r[item]['id']}\n"
                            f"Image URL: {r[item]['image_url']}")
 
     @begone_manage.command()
     @commands.has_any_role('Staff')
     async def remove_image(self, ctx, image_id):
         try:
-            await self.bot.db.execute('DELETE FROM begone WHERE ID=%s', args = image_id)
+            await self.bot.db.execute('DELETE FROM begone WHERE id=%s', args = image_id)
         except Exception as e:
             print(e)
 
@@ -61,12 +61,12 @@ class Begone:
             try:
                 await ctx.guild.ban(discord.Object(id=member), reason=reason)
                 member = await self.bot.get_user_info(member)
-                r = self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
+                r = self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
                 if r:
                   rand = random.choice(r)
                   embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
                 else:
-                  r = self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`=0')
+                  r = self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`=0')
                   rand = random.choice(r)
                   embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
             except Exception as e:
