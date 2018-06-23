@@ -33,6 +33,24 @@ def needs_profile(keys=None):
     return commands.check(predicate)
 
 
+def levelup_gold(lvl):
+    if lvl <= 5:
+        amount = random.randint(1, 10)
+    elif lvl <= 10:
+        amount = random.randint(5, 10)
+    elif lvl <= 20:
+        amount = random.randint(5, 15)
+    elif lvl <= 30:
+        amount = random.randint(10, 20)
+    elif lvl <= 40:
+        amount = random.randint(15, 20)
+    elif lvl <= 50:
+        amount = random.randint(20, 30)
+    else:
+        amount = random.randint(25, 35)
+    return amount
+
+
 class Profile:
     __slots__ = ('user_id', 'level', 'experience', 'fame', 'coins')
 
@@ -57,23 +75,6 @@ class Profiles:
         self.bot = bot
         self.cooldowns = {}
         self._locks = dict()
-
-    def get_bonus_amount(self, lvl):
-        if lvl <= 5:
-            amount = random.randint(1, 10)
-        elif lvl <= 10:
-            amount = random.randint(5, 10)
-        elif lvl <= 20:
-            amount = random.randint(5, 15)
-        elif lvl <= 30:
-            amount = random.randint(10, 20)
-        elif lvl <= 40:
-            amount = random.randint(15, 20)
-        elif lvl <= 50:
-            amount = random.randint(20, 30)
-        else:
-            amount = random.randint(25, 35)
-        return amount
 
     def get_lock(self, name):
         lock = self._locks.get(name)
@@ -118,7 +119,7 @@ class Profiles:
             if profile.experience >= needed:
                 profile.level += 1
                 profile.experience -= needed
-                profile.coins += self.get_bonus_amount(profile.level)
+                profile.coins += levelup_gold(profile.level)
 
                 if profile.level % 5 == 0:
                     role = discord.utils.get(msg.guild.roles, name=str(profile.level))
