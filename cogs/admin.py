@@ -53,7 +53,7 @@ class Admin:
     @commands.command(hidden=True)
     async def unload(self, ctx, *, cog: cogname):
         """Unloads a cog."""
-        if self.bot.extensions.get(cogname):
+        if self.bot.extensions.get(cog):
             self.bot.unload_extension(cog)
             await ctx.send(embed=discord.Embed(title=f'Unloaded {cog}', color=0x54d154))
         else:
