@@ -11,6 +11,10 @@ import discord
 from discord.ext import commands
 
 
+def cogname(name):
+    return name if name.startswith('cogs.') else f'cogs.{name}'
+
+
 class Admin:
     """Admin-only commands that make the bot dynamic."""
 
@@ -37,35 +41,34 @@ class Admin:
         return f'```py\n{e.text}{"^":>{e.offset}}\n{e.__class__.__name__}: {e}```'
 
     @commands.command(hidden=True)
-    async def load(self, ctx, *, module):
-        """Loads a module."""
+    async def load(self, ctx, *, cog: cogname):
+        """Loads a cog."""
         try:
-            self.bot.load_extension(module)
+            self.bot.load_extension(cog)
         except Exception as e:
             await ctx.send(f'```py\n{traceback.format_exc()}\n```')
         else:
-            await ctx.send('\N{OK HAND SIGN}')
+            await ctx.send(embed=discord.Embed(title=f'Loaded {cog}', color=0x54d154))
 
     @commands.command(hidden=True)
-    async def unload(self, ctx, *, module):
-        """Unloads a module."""
-        try:
-            self.bot.unload_extension(module)
-        except Exception as e:
-            await ctx.send(f'```py\n{traceback.format_exc()}\n```')
+    async def unload(self, ctx, *, cog: cogname):
+        """Unloads a cog."""
+        if self.bot.extensions.get(cogname):
+            self.bot.unload_extension(cog)
+            await ctx.send(embed=discord.Embed(title=f'Unloaded {cog}', color=0x54d154))
         else:
-            await ctx.send('\N{OK HAND SIGN}')
+            await ctx.send(embed=discord.Embed(title="That cog wasn't loaded", color=0xd15454))
 
     @commands.command(name='reload', hidden=True)
-    async def _reload(self, ctx, *, module):
-        """Reloads a module."""
+    async def _reload(self, ctx, *, cog: cogname):
+        """Reloads a cog."""
         try:
-            self.bot.unload_extension(module)
-            self.bot.load_extension(module)
+            self.bot.unload_extension(cog)
+            self.bot.load_extension(cog)
         except Exception as e:
             await ctx.send(f'```py\n{traceback.format_exc()}\n```')
         else:
-            await ctx.send('\N{OK HAND SIGN}')
+            await ctx.send(embed=discord.Embed(title=f'Reloaded {cog}', color=0x54d154))
 
     @commands.command(hidden=True, name='eval')
     async def _eval(self, ctx, *, body: str):
