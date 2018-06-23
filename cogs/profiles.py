@@ -9,11 +9,11 @@ EXCLUDED_CHANNELS = []
 
 
 def exp_needed(level):
-    return level*250
+    return level * 250
 
 
 def exp_total(level):
-    return sum([exp_needed(x) for x in range(level+1)])
+    return sum([exp_needed(x) for x in range(level + 1)])
 
 
 def needs_profile(keys=None):
@@ -29,6 +29,7 @@ def needs_profile(keys=None):
             ctx.profile = await cog.get_profile(ctx.author.id, keys)
 
         return True
+
     return commands.check(predicate)
 
 
@@ -56,6 +57,23 @@ class Profiles:
         self.bot = bot
         self.cooldowns = {}
         self._locks = dict()
+
+    def get_bonus_amount(self, lvl):
+        if lvl <= 5:
+            amount = random.randint(1, 10)
+        elif lvl <= 10:
+            amount = random.randint(5, 10)
+        elif lvl <= 20:
+            amount = random.randint(5, 15)
+        elif lvl <= 30:
+            amount = random.randint(10, 20)
+        elif lvl <= 40:
+            amount = random.randint(15, 20)
+        elif lvl <= 50:
+            amount = random.randint(20, 30)
+        else:
+            amount = random.randint(25, 35)
+        return amount
 
     def get_lock(self, name):
         lock = self._locks.get(name)
@@ -100,13 +118,13 @@ class Profiles:
             if profile.experience >= needed:
                 profile.level += 1
                 profile.experience -= needed
-                profile.coins += random.randint(1, 10)
+                profile.coins += self.get_bonus_amount(profile.level)
 
                 if profile.level % 5 == 0:
                     role = discord.utils.get(msg.guild.roles, name=str(profile.level))
                     if role:
                         await msg.author.add_roles(role, reason=f"Reached level {profile.level}")
-                        rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level-5, 1)))
+                        rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level - 5, 1)))
                         await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
                 if profile.level == 10:
@@ -117,10 +135,9 @@ class Profiles:
 
     async def on_member_join(self, member):
         profile = await self.get_profile(member.id, ('level',))
-        role = discord.utils.get(member.guild.roles, name=str(profile.level//5*5))
+        role = discord.utils.get(member.guild.roles, name=str(profile.level // 5 * 5))
         if role:
             await member.add_roles(role, reason=f"Re-joined the server at level {profile.level}")
-
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
@@ -142,7 +159,7 @@ class Profiles:
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
-    async def setlevel(self, ctx, member: discord.Member, level: int, xp: int= None):
+    async def setlevel(self, ctx, member: discord.Member, level: int, xp: int = None):
         async with self.get_lock(ctx.author.id):
             profile = await self.get_profile(member.id, ['level'])
             profile.level = level
@@ -190,7 +207,7 @@ class Profiles:
         await ctx.send(embed=em)
 
     @commands.command(hidden=True, aliases=['leaderboards', 'ranks', 'rankings'])
-    async def leaderboard(self, ctx, page: int=1):
+    async def leaderboard(self, ctx, page: int = 1):
         guild = self.bot.get_guild(215424443005009920)
         qry = f"""
         select `user_id`, `level`, `experience`, `rank` FROM
@@ -202,9 +219,11 @@ class Profiles:
         ) as t
         limit %s, %s
         """
-        r = await ctx.bot.db.fetch(qry, ((page-1)*10, 10))
+        r = await ctx.bot.db.fetch(qry, ((page - 1) * 10, 10))
         w = max(len(getattr(guild.get_member(user_id), 'display_name', 'user_left')) for user_id, lvl, xp, rank in r)
-        output = '```\n'+'\n'.join([f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - Lv{lvl:<4} {xp:<5} / {exp_needed(lvl):>5}xp" for user_id, lvl, xp, rank in r])+'```'
+        output = '```\n' + '\n'.join([
+                                         f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - Lv{lvl:<4} {xp:<5} / {exp_needed(lvl):>5}xp"
+                                         for user_id, lvl, xp, rank in r]) + '```'
         await ctx.send(output)
 
     @commands.command(aliases=['experience'])

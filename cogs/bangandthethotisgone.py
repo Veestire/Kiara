@@ -1,4 +1,3 @@
-import json
 import random
 
 import discord
@@ -7,24 +6,20 @@ from cogs.moderation import MemberID
 STAFF_CHANNEL = 231008480079642625
 
 
-async def generate_embed(title, image_url):
-    embed = discord.Embed(title=title, colour=discord.Colour(0xd39466))
+async def generate_embed(title, image_url, reason):
+    if reason is not None:
+        embed = discord.Embed(title=title, colour=discord.Colour(0xd39466), description=reason)
+    else:
+        embed = discord.Embed(title=title, colour=discord.Colour(0xd39466))
     embed.set_image(url=image_url)
     return embed
 
 
-async def save_json(data):
-    with open('/home/Kiara/data.json', 'w') as json_file_to_write:
-        json.dump(data, json_file_to_write)
-
-
-class BangAndTheThotIsGone:
-    """Begone Thot meme command!"""
+class Begone:
+    """The Begone Thot Command, STAFF ONLY"""
 
     def __init__(self, bot):
         self.bot = bot
-        with open('/home/Kiara/data.json') as json_file:
-            self.data = json.load(json_file)
 
     @commands.group(name="begonemanage")
     @commands.has_any_role('Staff')
@@ -34,44 +29,29 @@ class BangAndTheThotIsGone:
 
     @begone_manage.command()
     @commands.has_any_role('Staff')
-    async def add_image(self, ctx, imageurl, memberid='Default'):
+    async def add_image(self, ctx, image_url, member_id='0'):
         try:
-            self.data[memberid].append(imageurl)
-            await ctx.send(f"Successfully added the image for {memberid}")
-            await save_json(self.data)
-        except KeyError as k:
-            await ctx.send(f"Failed to add image for the MemberID: {k} "
-                           f"\nMost likely cause of this is because the specified id does not exist in the"
-                           f" data file!")
-
-    @begone_manage.command()
-    @commands.has_any_role('Staff')
-    async def add_user(self, ctx, member: discord.Member):
-        for role in member.roles:
-            if role.name == "Staff":
-                await ctx.send(f"Adding member {member.display_name} to the data file")
-                self.data[str(member.id)] = []
-                await save_json(self.data)
-                return
-        await ctx.send("member specified is not staff, therefore cannot be added")
-
-    @begone_manage.command()
-    @commands.has_any_role('Staff')
-    async def remove_image(self, ctx, imageid: int, memberid='Default'):
-        member_images = self.data[memberid]
-        try:
-            member_images.pop(imageid)
-            self.data[memberid] = member_images
-            await save_json(self.data)
+            await self.bot.db.execute('INSERT INTO `begone` (user_id, image_url) VALUES (%s, %s)',
+                                      args=(member_id, image_url))
+            await ctx.send(f"Successfully added the image for {member_id}")
         except Exception as e:
-            await ctx.send(e)
+            print(e)
+
+    @begone_manage.command()
+    async def list_images(self, ctx, member_id='0'):
+        #Simple Query to obtain all images related to the specified member_id
+        r = await self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`={member_id}')
+        for item in range(len(r)):
+            await ctx.send(f"Image ID: {r[item]['ID']}\n"
+                           f"Image URL: {r[item]['image_url']}")
 
     @begone_manage.command()
     @commands.has_any_role('Staff')
-    async def list_images(self, ctx, memberid="Default"):
-        member_images = self.data[memberid]
-        for i in range(0, len(member_images)):
-            await ctx.send(embed=await generate_embed(i, member_images[i]))
+    async def remove_image(self, ctx, image_id):
+        try:
+            await self.bot.db.execute('DELETE FROM begone WHERE ID=%s', args = image_id)
+        except Exception as e:
+            print(e)
 
     @commands.command(name="begone", aliases=["thot", "begonethot"])
     @commands.has_any_role('Staff')
@@ -81,13 +61,14 @@ class BangAndTheThotIsGone:
             try:
                 await ctx.guild.ban(discord.Object(id=member), reason=reason)
                 member = await self.bot.get_user_info(member)
-                if str(ctx.author.id) in self.data:
-                    if self.data[str(ctx.author.id)]:
-                        return await ctx.send(
-                            embed=await generate_embed(f'Banned {member}!',
-                                                       random.choice(self.data[str(ctx.author.id)])))
-                await ctx.send(
-                    embed=await generate_embed(f'Banned {member}!', random.choice(self.data["Default"])))
+                r = self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
+                if r:
+                  rand = random.choice(r)
+                  embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
+                else:
+                  r = self.bot.db.fetchdicts(f'SELECT `ID`, `image_url` FROM `begone` WHERE `user_id`=0')
+                  rand = random.choice(r)
+                  embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
             except Exception as e:
                 await ctx.send(e)
         else:
@@ -98,4 +79,4 @@ class BangAndTheThotIsGone:
 
 
 def setup(bot):
-    bot.add_cog(BangAndTheThotIsGone(bot))
+    bot.add_cog(Begone(bot))
