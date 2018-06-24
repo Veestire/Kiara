@@ -4,6 +4,7 @@ from discord.ext import commands
 
 
 class Dev:
+    """Development stuff"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -17,6 +18,7 @@ class Dev:
         if ch:
             ch = self.bot.get_channel(int(ch))
             await ch.send("Back")
+            await self.bot.redis.delete('restartmessage')
 
     async def on_message(self, message):
         if not message.guild:
