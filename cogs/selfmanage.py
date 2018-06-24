@@ -67,6 +67,8 @@ class Selfmanage:
             self.active_intros += [member.id]
         roles_to_add = []
 
+        fresh = discord.utils.get(member.roles, id=373122164544765953) is None
+
         try:
             await self.bot.wait_for('message',
                                     check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
@@ -92,6 +94,9 @@ class Selfmanage:
                 await member.remove_roles(*[discord.utils.get(guild.roles, id=x) for x in self.all_roles])
                 await member.add_roles(*roles_to_add)
                 await member.send('Thank you for answering, the appropriate roles have been assigned to you! If there are any issues, please contact a staff member and they will happily assist you.')
+                if fresh:
+                    monitorlog = self.bot.get_cog('Monitor')
+                    await monitorlog.post_member_log(member)
             except Exception as e:
                 print(e)
             self.active_intros.remove(member.id)

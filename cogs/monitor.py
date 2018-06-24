@@ -1,9 +1,12 @@
 import asyncio
+import datetime
 
 import discord
 from discord.ext import commands
 
 MONITOR_CHANNEL = 399852942213251083
+LOGS_CHANNEL = 460436973560135680
+
 
 class MemberID(commands.Converter):
     async def convert(self, ctx, argument):
@@ -17,11 +20,25 @@ class MemberID(commands.Converter):
         else:
             return m.id
 
+
 class Monitor:
+    """Monitoring needs"""
 
     def __init__(self, bot):
         self.bot = bot
         self.logged_users = []
+
+    async def post_member_log(self, member):
+        now = datetime.datetime.utcnow()
+        days, r = divmod(int((now - member.created_at).total_seconds()), 86400)
+        h, r = divmod(r, 3600)
+        m, s = divmod(r, 60)
+        e = discord.Embed(title=f'{member} did the intro', description=f'Made {days} days {h:02}:{m:02}:{s:02} ago',
+                          color=discord.Colour.green())
+        e.set_thumbnail(url=member.avatar_url)
+        e.set_footer(text=member.id)
+        e.timestamp = now
+        await self.bot.get_channel(LOGS_CHANNEL).send(embed=e)
 
     @commands.group(invoke_without_command=True)
     @commands.has_any_role('Staff')
