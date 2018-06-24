@@ -7,6 +7,8 @@ import itertools
 import discord
 from discord.ext import commands
 
+from cogs.utils.cooldowns import basic_cooldown
+
 base_colors = [
     ("Red", 424579184216506368, 30),
     ("Yellow", 424579315066208276, 30),
@@ -88,7 +90,7 @@ class Economy:
         for name, data, cost in extra_colors:
             self.shops[1].add(Item(name, ItemType.ROLE, cost=cost, data=data))
 
-    @commands.cooldown(1, 86400, commands.BucketType.user)
+    @basic_cooldown(86400)
     @commands.guild_only()
     @commands.command(aliases=['daily'])
     async def dailies(self, ctx):
