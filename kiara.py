@@ -52,6 +52,8 @@ class Kiara(commands.Bot):
         await self.invoke(ctx)
 
     async def on_command_error(self, ctx, error):
+        if hasattr(ctx.command, 'on_error'):
+            return
         # TODO: Add extra error handling
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send('This command is only for use inside guilds.')
