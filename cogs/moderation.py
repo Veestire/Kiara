@@ -14,12 +14,12 @@ STAFF_CHANNEL = 231008480079642625
 MUTED_ROLE = 348331525479071745
 BUMP_CHANNEL = 407581915726610443
 
-INVITE_REGEX = "(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+"
 
 def get_date(text):
     cal = pdt.Calendar()
     time, res = cal.parseDT(text, datetime.datetime.utcnow())
     return time if res else None
+
 
 class MemberID(commands.Converter):
     async def convert(self, ctx, argument):
@@ -39,6 +39,7 @@ class MemberID(commands.Converter):
                 raise commands.BadArgument('You cannot do this action on this user due to role hierarchy.')
             return m.id
 
+
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
         ban_list = await ctx.guild.bans()
@@ -51,6 +52,7 @@ class BannedMember(commands.Converter):
         if entity is None:
             raise commands.BadArgument("Not a valid previously-banned member.")
         return entity
+
 
 class Moderation:
     """Moderation commands"""
@@ -110,7 +112,7 @@ class Moderation:
 
     @commands.command()
     @commands.has_role('Staff')
-    async def mute(self, ctx, member: discord.Member, minutes: int = 5, *, reason = None):
+    async def mute(self, ctx, member: discord.Member, minutes: int = 5, *, reason=None):
         await member.add_roles(discord.utils.get(ctx.guild.roles, id=MUTED_ROLE))
         await self.timers.create_timer('unmute', datetime.datetime.utcnow() + datetime.timedelta(minutes=minutes),
                                        [ctx.guild.id, member.id])
