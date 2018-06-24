@@ -35,7 +35,7 @@ def signature(cmd):
         else:
             result.append('<%s>' % name)
 
-    add = "\n\n<Aliases>\n"+', '.join(f'  {alias}' for alias in cmd.aliases) if len(cmd.aliases) > 0 else ''
+    add = "\n\n<Aliases>\n"+', '.join(f'{alias}' for alias in cmd.aliases) if len(cmd.aliases) > 0 else ''
 
     return ' '.join(result)+add
 
