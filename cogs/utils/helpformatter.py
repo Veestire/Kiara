@@ -4,7 +4,43 @@ import inspect
 import itertools
 from discord.ext.commands import HelpFormatter, Paginator, Command
 
-class RubHelpFormatter(HelpFormatter):
+
+def signature(cmd):
+    """Returns a POSIX-like signature useful for help command output."""
+    result = []
+    parent = cmd.full_parent_name
+
+    name = cmd.name if not parent else parent + ' ' + cmd.name
+    result.append(name)
+
+    if cmd.usage:
+        result.append(cmd.usage)
+        return ' '.join(result)
+
+    params = cmd.clean_params
+    if not params:
+        return ' '.join(result)
+
+    for name, param in params.items():
+        if param.default is not param.empty:
+            # We don't want None or '' to trigger the [name=value] case and instead it should
+            # do [name] since [name=None] or [name=] are not exactly useful for the user.
+            should_print = param.default if isinstance(param.default, str) else param.default is not None
+            if should_print:
+                result.append('[%s=%s]' % (name, param.default))
+            else:
+                result.append('[%s]' % name)
+        elif param.kind == param.VAR_POSITIONAL:
+            result.append('[%s...]' % name)
+        else:
+            result.append('<%s>' % name)
+
+    add = "\n\n<Aliases>\n"+', '.join(f'  {alias}' for alias in cmd.aliases) if len(cmd.aliases) > 0 else ''
+
+    return ' '.join(result)+add
+
+
+class KiaraFormatter(HelpFormatter):
 
     def __init__(self):
         super().__init__()
@@ -31,16 +67,17 @@ class RubHelpFormatter(HelpFormatter):
 
         if description:
             # <description> portion
-            self._paginator.add_line(f'[ {description} ][-]', empty=True)
+            self._paginator.add_line(f'[ {description} ][-!`.]', empty=True)
 
         if isinstance(self.command, Command):
-            # <signature portion>
-            signature = self.get_command_signature()
-            self._paginator.add_line(f"{signature}", empty=True)
-
             # <long doc> section
             if self.command.help:
                 self._paginator.add_line(self.command.help, empty=True)
+
+            # <signature portion>
+            signature = self.get_command_signature()
+            self._paginator.add_line(f"<Usage>")
+            self._paginator.add_line(f"{signature}", empty=True)
 
             # end it here if it's just a regular command
             if not self.has_subcommands():
@@ -53,7 +90,7 @@ class RubHelpFormatter(HelpFormatter):
             cog = tup[1].cog_name
             # we insert the zero width space there to give it approximate
             # last place sorting position.
-            return f' <{cog}>' if cog is not None else '<Other>'
+            return f'<{cog}>' if cog is not None else '<Other>'
 
         filtered = yield from self.filter_command_list()
         if self.is_bot():
@@ -76,6 +113,13 @@ class RubHelpFormatter(HelpFormatter):
         ending_note = self.get_ending_note()
         self._paginator.add_line(ending_note)
         return self._paginator.pages
+
+    def get_command_signature(self):
+        """Retrieves the signature portion of the help page."""
+        prefix = self.clean_prefix
+        cmd = self.command
+        return prefix + signature(cmd)
+
 
     def _add_subcommands_to_page(self, max_width, commands):
         for name, command in commands:

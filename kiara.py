@@ -9,6 +9,8 @@ import aioredis
 
 from cogs.utils import context, db
 from cogs.utils.config import Config
+from cogs.utils.helpformatter import KiaraFormatter
+
 
 desc = 'A personal bot for Waifu Worshipping'
 
@@ -18,8 +20,8 @@ config = Config()
 class Kiara(commands.Bot):
 
     def __init__(self):
-        super().__init__(command_prefix=config.prefix, description=desc, pm_help=None, help_attrs=dict(hidden=True),
-                         game=discord.Game(name='~help'))
+        super().__init__(command_prefix=config.prefix.split(), description=desc, pm_help=None,
+                         help_attrs=dict(hidden=True), game=discord.Game(name='~help'), formatter=KiaraFormatter())
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.db = db.DB(config.MYSQL_HOST, config.MYSQL_USER, config.MYSQL_PASSWORD, config.MYSQL_DATABASE, self.loop)
