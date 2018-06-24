@@ -94,6 +94,7 @@ class Economy:
     @commands.guild_only()
     @commands.command(aliases=['daily'])
     async def dailies(self, ctx):
+        """Claim your daily gold"""
         amount = random.randint(1, 5)
         async with self.profiles.get_lock(ctx.author.id):
             profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
@@ -197,6 +198,7 @@ class Economy:
     @commands.guild_only()
     @commands.command(aliases=['wallet', 'gold', 'money', 'coins'])
     async def balance(self, ctx, member: discord.Member = None):
+        """Check how much gold you have"""
         if member is None:
             member = ctx.author
 
@@ -207,6 +209,7 @@ class Economy:
     @commands.guild_only()
     @commands.command(aliases=['sendmoney', 'pay', 'tip'])
     async def givemoney(self, ctx, receiver: discord.Member = None, amount: int = 0):
+        """Send some gold to someone"""
         if receiver is None:
             return await ctx.send("I don't know who you want to give money to.")
         if amount <= 0:
