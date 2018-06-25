@@ -63,12 +63,14 @@ class Begone:
                 member = await self.bot.get_user_info(member)
                 r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
                 if r:
-                  rand = random.choice(r)
-                  embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
+                    rand = random.choice(r)
+                    embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
+                    await ctx.send(embed = embed)
                 else:
-                  r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`=0')
-                  rand = random.choice(r)
-                  embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
+                    r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`=0')
+                    rand = random.choice(r)
+                    embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
+                    await ctx.send(embed = embed)
             except Exception as e:
                 await ctx.send(e)
         else:
