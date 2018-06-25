@@ -61,14 +61,14 @@ class Begone:
             try:
                 await ctx.guild.ban(discord.Object(id=member), reason=reason)
                 member = await self.bot.get_user_info(member)
-                r = self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
+                r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`={ctx.author.id}')
                 if r:
                   rand = random.choice(r)
-                  embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
+                  embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
                 else:
-                  r = self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`=0')
+                  r = await self.bot.db.fetchdicts(f'SELECT `id`, `image_url` FROM `begone` WHERE `user_id`=0')
                   rand = random.choice(r)
-                  embed=await generate_embed(f'Banned {member}!',rand['image_url'],reason)
+                  embed = await generate_embed(f'Banned {member}!', rand['image_url'], reason)
             except Exception as e:
                 await ctx.send(e)
         else:
