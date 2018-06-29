@@ -20,7 +20,7 @@ config = Config()
 class Kiara(commands.Bot):
 
     def __init__(self):
-        super().__init__(command_prefix=config.prefix.split(), description=desc, pm_help=None,
+        super().__init__(command_prefix=config.prefix.split(), description=desc, pm_help=None, case_insensitive=True,
                          help_attrs=dict(hidden=True), game=discord.Game(name='~help'), formatter=KiaraFormatter())
         self.load_cogs()
         self.session = aiohttp.ClientSession(loop=self.loop)
