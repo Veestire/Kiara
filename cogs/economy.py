@@ -197,7 +197,7 @@ class Economy:
 
     @commands.guild_only()
     @commands.command(aliases=['wallet', 'gold', 'money', 'coins'])
-    async def balance(self, ctx, member: discord.Member = None):
+    async def balance(self, ctx, *, member: discord.Member = None):
         """Check how much gold you have"""
         if member is None:
             member = ctx.author
