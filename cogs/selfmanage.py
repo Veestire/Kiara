@@ -1,4 +1,6 @@
 import asyncio
+import traceback
+
 import discord
 from discord.ext import commands
 
@@ -96,7 +98,7 @@ class Selfmanage:
                     monitorlog = self.bot.get_cog('Monitor')
                     await monitorlog.post_member_log(member)
             except Exception as e:
-                print(e)
+                traceback.print_tb(e.__traceback__)
             self.active_intros.remove(member.id)
 
 
