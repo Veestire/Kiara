@@ -21,7 +21,7 @@ def needs_profile(keys=None):
         if ctx.guild is None:
             return False
 
-        if ctx.invoked_with == 'help':
+        if ctx.invoked_with.lower() == 'help':
             return True
 
         cog = ctx.bot.get_cog('Profiles')
