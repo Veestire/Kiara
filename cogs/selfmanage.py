@@ -25,9 +25,7 @@ class Selfmanage:
     questions = [
         ('Are you happy to receive messages from other users in the server?', 353019520983629824),
         ('Are you interested in being informed about all future server-wide events? (Movie nights, gaming events, and other fun activities)', 347689132908085248),
-        ('Are you interested in seeing vanilla 18+ content? (Includes #hentai, #ecchi, #porn, #rule-34, #doujins #hentai-gifs)', 371251751564869632),
-        ('Are you interetsed in seeing kink-related 18+ content? (Includes #anal, #feet, #femdom, #bondage, #petplay, #yuri, #yaoi, #trap, #futa, #tentacles, #furry)', 371251837946560533),
-        ('Are you interested in seeing extreme 18+ content? (Includes #extreme, #ahegao, #forced)', 323409208584306700),
+        ('Are you interested in seeing NSFW content?', 371251751564869632),
         ('Are you interested in roleplay channels?', 389376686745059329),
     ]
 
