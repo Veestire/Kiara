@@ -1,3 +1,4 @@
+import datetime
 import re
 
 import discord
@@ -23,6 +24,11 @@ class Automod:
             if discord.utils.get(msg.author.roles, name="Staff") is None:
                 await msg.delete()
                 await msg.channel.send(f"{msg.author.mention} you sent an invite link, I deleted it for you.")
+
+    async def on_member_join(self, member):
+        if member.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
+            await member.send("Your account has been kicked for being under a day old to prevent malicious users joining the server.")
+            await member.kick(reason="Auto-kick for suspicious account")
 
 
 def setup(bot):
