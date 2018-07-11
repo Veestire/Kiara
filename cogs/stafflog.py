@@ -47,6 +47,8 @@ class Stafflog:
         await asyncio.sleep(2)
         log = await member.guild.audit_logs(action=discord.AuditLogAction.kick).get(target__id=member.id)
         if log:
+            if 'Auto-kick' in log.reason:
+                return
             await self.make_case(member, 'Kick', log.reason, log.user)
 
     async def on_member_ban(self, guild, member):
