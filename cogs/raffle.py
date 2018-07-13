@@ -51,10 +51,10 @@ class Raffle:
         if datetime.datetime.utcnow() >= end:
             entries = await self.bot.redis.lrange(f'raffle_entries:{message_id}', 0, -1, encoding='utf8') or ['???']
             winner = random.choice(entries)
-            await message.edit(content=random.randint(1, 100), embed=await self.generate_end_embed(message_id, winner))
+            await message.edit(embed=await self.generate_end_embed(message_id, winner))
             await self.bot.redis.delete(f'raffle:{message_id}')
         else:
-            await message.edit(content=random.randint(1, 100), embed=await self.generate_embed(message_id))
+            await message.edit(embed=await self.generate_embed(message_id))
 
     @commands.has_role('Staff')
     @commands.command()
