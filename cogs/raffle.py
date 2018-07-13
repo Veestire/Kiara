@@ -56,8 +56,7 @@ class Raffle:
         else:
             await message.edit(content=random.randint(1, 100), embed=await self.generate_embed(message_id))
 
-
-
+    @commands.has_role('Staff')
     @commands.command()
     async def createraffle(self, ctx, cost: int, hours: int, *, reward):
         message = await self.raffle_channel.send('setting up raffle..')
@@ -71,6 +70,7 @@ class Raffle:
         await message.edit(content=None, embed=await self.generate_embed(message.id))
         self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
 
+    @commands.has_role('Staff')
     @commands.command()
     async def clearraffles(self, ctx):
         await ctx.redis.delete(*await self.bot.redis.keys('raffle:*'))
