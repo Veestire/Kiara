@@ -1,8 +1,7 @@
+import asyncio
 import datetime
-import json
 import random
 
-import asyncio
 import discord
 from discord.ext import commands
 
@@ -10,125 +9,133 @@ from discord.ext import commands
 def custom_format(td):
     minutes, seconds = divmod(td.seconds, 60)
     hours, minutes = divmod(minutes, 60)
-    return '{:d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
-
-
-def can_change():
-    async def predicate(ctx):
-        return ctx.author.id in [73389450113069056, 211238461682876416]
-    return commands.check(predicate)
-
-def event_channel():
-    async def predicate(ctx):
-        return ctx.channel.id == 358962517290254356
-    return commands.check(predicate)
+    return '{:d}:{:02d}'.format(hours, minutes)
 
 
 class Raffle:
-    """Raffle related commands"""
 
     def __init__(self, bot):
         self.bot = bot
-        self.conf = {}
+        self.profiles = bot.get_cog("Profiles")
+        self.raffle_channel = None
+        self.raffles = []
+        self.bg_task = bot.loop.create_task(self.raffle_interval())
 
-        self.raffle_title = "🐰 The Easter Bunny's Arrived~ 🐇"
+    def __unload(self):
+        self.bg_task.cancel()
 
-        with open('/home/Kiara/raffle.json') as file:
-            self.conf = json.load(file)
+    async def raffle_interval(self):
+        await self.bot.wait_until_ready()
+        # Load the channel and raffles from redis
+        self.raffle_channel = self.bot.get_channel(415069459867500545)
+        self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
+        try:
+            while not self.bot.is_closed():
+                print('---begin')
+                self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
+                for key in self.raffles:
+                    message_id = int(key.split(':')[1])
+                    print(message_id)
+                    await self.update_raffle(message_id)
+                    await asyncio.sleep(5)
+                print('---end')
+                await asyncio.sleep(60)
+        except Exception as e:
+            print(e)
 
-    @commands.group()
-    @event_channel()
-    async def raffle(self, ctx):
-        if ctx.invoked_subcommand:
-            return
-        cooldown = datetime.timedelta(hours=self.conf['cooldown'])
-        r = await self.bot.db.fetchone(f'SELECT `timestamp` FROM cooldowns WHERE user_id={ctx.author.id}')
-        if not r:
-            await self.bot.db.execute(f'INSERT INTO cooldowns VALUES ({ctx.author.id}, "{ctx.message.created_at}")')
+    async def update_raffle(self, message_id):
+        message = await self.raffle_channel.get_message(message_id)
+        end = await self.bot.redis.hget(f'raffle:{message_id}', 'end', encoding='utf8')
+        end = datetime.datetime.utcfromtimestamp(int(end))
+
+        if datetime.datetime.utcnow() >= end:
+            entries = await self.bot.redis.lrange(f'raffle_entries:{message_id}', 0, -1, encoding='utf8') or ['???']
+            winner = random.choice(entries)
+            await message.edit(content=random.randint(1, 100), embed=await self.generate_end_embed(message_id, winner))
+            await self.bot.redis.delete(f'raffle:{message_id}')
         else:
-            d = abs(ctx.message.created_at - r[0])
-            if d < cooldown:
-                await ctx.send(f"You've recently entered the raffle, try again in {custom_format(cooldown-d)}")
-                return
-            else:
-                await self.bot.db.execute(
-                    f'UPDATE cooldowns SET timestamp="{ctx.message.created_at}" WHERE user_id={ctx.author.id}')
-        pre = [
-            'found an Easter gift, it was...'
-        ]
-        lose = [
-            'an empty egg wrapper... :('
-        ]
-        emb = discord.Embed(color=discord.Color(0xbdeefe))
-        roll = random.uniform(0, 100)
-        won = roll <= self.conf['chance']
-        if won:
-            emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}*\n'
-                                                            f'**A basket full of Easter goodies!** 🌟')
-            await self.dm_owner(ctx.author)
-        else:
-            emb.add_field(name=self.raffle_title, value=f'*{ctx.author.mention} {random.choice(pre)}\n'
-                                                            f'{random.choice(lose)}*')
-        emb.set_footer(text=f'Rolled {roll:.2f} / 100 (Roll under {self.conf["chance"]} to win)',
-                       icon_url='https://cdn.discordapp.com/attachments/231008480079642625/369344924556197889/1adc9faf91526bb7a2c1d0b7b3516cae.png')
-        await ctx.send(embed=emb)
+            await message.edit(content=random.randint(1, 100), embed=await self.generate_embed(message_id))
 
-    @raffle.command()
-    @commands.has_permissions(administrator=True)
-    async def chance(self, ctx, *, value: float = None):
-        if value:
-            self.conf['chance'] = value
-            with open('/home/Kiara/raffle.json', 'w') as file:
-                json.dump(self.conf, file)
-            await ctx.send(f"Set the chance to `{value}%`!")
-        else:
-            await ctx.send(self.conf['chance'])
 
-    @raffle.command()
-    @commands.has_permissions(administrator=True)
-    async def prize(self, ctx, *, value=None):
-        if value:
-            self.conf['prize'] = value
-            with open('/home/Kiara/raffle.json', 'w') as file:
-                json.dump(self.conf, file)
-            await ctx.send(f"Set the prize to `{value}`!")
-        else:
-            await ctx.send(self.conf['prize'])
-
-    @raffle.command()
-    @commands.has_permissions(administrator=True)
-    async def cooldown(self, ctx, *, value: float = None):
-        if value:
-            self.conf['cooldown'] = value
-            with open('/home/Kiara/raffle.json', 'w') as file:
-                json.dump(self.conf, file)
-            await ctx.send(f"Set the cooldown to `{value}` hours!")
-        else:
-            await ctx.send(self.conf['cooldown'])
-
-    @raffle.command()
-    @commands.has_permissions(administrator=True)
-    async def resetcooldowns(self, ctx):
-        """Reset all user's raffle cooldowns"""
-        await self.bot.db.execute(f'UPDATE cooldowns SET timestamp="2000-01-01 00:00:00" WHERE 1')
-        await ctx.send('Cooldowns reset!')
 
     @commands.command()
-    async def raffleinfo(self, ctx):
-        emb = discord.Embed(color=discord.Color(0xbdeefe), title='Raffle info')
-        emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
-        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
-        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
-        await ctx.send(embed=emb)
+    async def createraffle(self, ctx, cost: int, hours: int, *, reward):
+        message = await self.raffle_channel.send('setting up raffle..')
+        await message.add_reaction('💎')
 
-    async def dm_owner(self, winner):
-        owner = self.bot.get_user(73389450113069056)
-        emb = discord.Embed(color=discord.Color(0xbdeefe), title='Raffle info')
-        emb.add_field(name='Current prize', value=f"{self.conf['prize']}", inline=False)
-        emb.add_field(name='Win chance', value=f"{self.conf['chance']:.3g}%")
-        emb.add_field(name='Cooldown', value=f"{self.conf['cooldown']:.3g} hours")
-        await owner.send(f"Hey master! Someone won the raffle!\nUser: {winner}\nAnd here's the info <3", embed=emb)
+        raffle_id = await self.bot.redis.incr('rafflecount')
+        endtime = datetime.datetime.utcnow() + datetime.timedelta(hours=hours)
+        await self.bot.redis.hmset(f'raffle:{message.id}', 'raffle_id', raffle_id, 'cost', cost, 'reward', reward,
+                                   'end', round((endtime - datetime.datetime(1970, 1, 1)).total_seconds()))
 
+        await message.edit(content=None, embed=await self.generate_embed(message.id))
+        self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
+
+    @commands.command()
+    async def clearraffles(self, ctx):
+        await ctx.redis.delete(*await self.bot.redis.keys('raffle:*'))
+
+    async def generate_embed(self, message_id):
+        # fetch raffle info
+        raffle_id, reward, cost, end = await self.bot.redis.hmget(f'raffle:{message_id}', 'raffle_id', 'reward', 'cost',
+                                                                  'end', encoding='utf8')
+        num_entries = await self.bot.redis.llen(f'raffle_entries:{message_id}')
+        embed = discord.Embed(title=f"Raffle #{raffle_id} | Enter by reacting with 💎")
+        embed.colour = 0x33cccc
+        embed.add_field(name='Prize', value=str(reward or '?'))
+        embed.add_field(name='Entry cost', value=str(cost or '?')+'g')
+        embed.add_field(name='Entries', value=num_entries)
+        # embed.add_field(name='Latest entries', value=f"", inline=False)
+        embed.timestamp = datetime.datetime.utcfromtimestamp(float(end))
+        embed.set_footer(text=f'⏰ Ends in {custom_format(datetime.datetime.utcfromtimestamp(float(end))-datetime.datetime.utcnow())} at')
+        return embed
+
+    async def generate_end_embed(self, message_id, winner_id):
+        # fetch raffle info
+        raffle_id, reward, cost, end = await self.bot.redis.hmget(f'raffle:{message_id}', 'raffle_id', 'reward', 'cost',
+                                                                  'end', encoding='utf8')
+        num_entries = await self.bot.redis.llen(f'raffle_entries:{message_id}')
+        embed = discord.Embed(title=f"Raffle #{raffle_id}")
+        embed.colour = 0xf25e9d
+        embed.add_field(name='Prize', value=str(reward or '?'))
+        embed.add_field(name='Entry cost', value=str(cost or '?')+'g')
+        embed.add_field(name='Entries', value=num_entries)
+        embed.add_field(name='Winner', value=f"<@{winner_id}>", inline=False)
+        embed.timestamp = datetime.datetime.utcfromtimestamp(float(end))
+        embed.set_footer(text=f'⏰ Ended')
+        return embed
+
+    async def on_raw_reaction_add(self, payload):
+        if payload.user_id == self.bot.user.id:
+            return
+        if payload.channel_id != 415069459867500545:
+            return
+        if str(payload.emoji) != '💎':
+            return
+
+        # Get the entry cost, and also if a raffle exists in the first place
+        cost, prize = await self.bot.redis.hmget(f'raffle:{payload.message_id}', 'cost', 'reward', encoding='utf8')
+        if cost is None:
+            return
+        cost = int(cost)
+
+        user = self.bot.get_user(payload.user_id)
+
+        # Check if the user already entered
+        if str(payload.user_id) in await self.bot.redis.lrange(f'raffle_entries:{payload.message_id}', 0, -1, encoding='utf8'):
+            return await user.send("You already entered that raffle.")
+
+        async with self.profiles.get_lock(payload.user_id):
+            # Check if the user has enough gold
+            profile = await self.profiles.get_profile(payload.user_id, ('coins',))
+            if profile.coins < int(cost):
+                return await user.send(f"Sorry, it costs {cost}g to enter for `{prize}`. You only have {profile.coins}g.")
+            profile.coins -= int(cost)
+            await profile.save(self.bot.db)
+
+        await self.bot.redis.rpush(f'raffle_entries:{payload.message_id}', payload.user_id)
+        await self.update_raffle(payload.message_id)
+        await user.send(f"Thanks! You've entered the `{prize}` raffle for {cost}g.")
 
 
 def setup(bot):
