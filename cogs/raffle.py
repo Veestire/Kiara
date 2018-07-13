@@ -31,14 +31,11 @@ class Raffle:
         self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
         try:
             while not self.bot.is_closed():
-                print('---begin')
                 self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
                 for key in self.raffles:
                     message_id = int(key.split(':')[1])
-                    print(message_id)
                     await self.update_raffle(message_id)
                     await asyncio.sleep(5)
-                print('---end')
                 await asyncio.sleep(60)
         except Exception as e:
             print(e)
