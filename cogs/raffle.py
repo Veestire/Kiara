@@ -27,7 +27,7 @@ class Raffle:
     async def raffle_interval(self):
         await self.bot.wait_until_ready()
         # Load the channel and raffles from redis
-        self.raffle_channel = self.bot.get_channel(358962517290254356)
+        self.raffle_channel = self.bot.get_channel(467614160251912193)
         self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
         try:
             while not self.bot.is_closed():
@@ -105,7 +105,7 @@ class Raffle:
     async def on_raw_reaction_add(self, payload):
         if payload.user_id == self.bot.user.id:
             return
-        if payload.channel_id != 358962517290254356:
+        if payload.channel_id != 467614160251912193:
             return
         if str(payload.emoji) != '💎':
             return
