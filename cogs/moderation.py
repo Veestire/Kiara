@@ -95,6 +95,22 @@ class Moderation:
             await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests banning {member.mention}.")
             await ctx.send('Your ban request has been received.')
 
+    @commands.command(aliases=['multiban'])
+    @commands.has_any_role('Staff')
+    async def massban(self, ctx, *members: MemberID):
+        permissions = ctx.channel.permissions_for(ctx.author)
+        if getattr(permissions, 'ban_members', None):
+            for member in members:
+                try:
+                    await ctx.guild.ban(discord.Object(id=member), reason="Mass ban")
+                    member = await self.bot.get_user_info(member)
+                    await ctx.send(f'Banned {member}!')
+                except Exception as e:
+                    await ctx.send(e)
+        else:
+            ch = self.bot.get_channel(STAFF_CHANNEL)
+            await ch.send(f"<@&293008190843387911> {ctx.author.mention} requests mass banning {' '.join(members)}.")
+
     @commands.command()
     @commands.has_any_role('Staff')
     async def unban(self, ctx, member: BannedMember, *, reason=None):
