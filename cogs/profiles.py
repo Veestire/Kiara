@@ -109,7 +109,7 @@ class Profiles:
 
             # Bonus for images
             if msg.attachments:
-                profile.experience += 10
+                profile.experience += 30
             else:
                 self.cooldowns[profile.user_id] = msg.created_at
 
