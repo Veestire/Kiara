@@ -20,6 +20,12 @@ class Report:
         """Report a person or situation
         This command will walk you through writing a report. Staff will be notified about reports.
         """
+        # Anti fucko check
+        ww = self.bot.get_guild(215424443005009920)
+        mem = ww.get_member(ctx.author.id)
+        if discord.utils.get(mem.roles, name="Member") is None:
+            return
+
         if ctx.guild:
             return await ctx.send('Please use this command in a DM with me.', delete_after=5)
 
