@@ -24,6 +24,7 @@ class Automod:
             if discord.utils.get(msg.author.roles, name="Staff") is None:
                 await msg.delete()
                 await msg.channel.send(f"{msg.author.mention} you sent an invite link, I deleted it for you.")
+                await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=348331525479071745))
 
     async def on_member_join(self, member):
         if member.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
