@@ -232,6 +232,17 @@ class Moderation:
             await ctx.send(msg)
         await ctx.message.delete()
 
+    @commands.command(aliases=['dm'])
+    @commands.has_permissions(administrator=True)
+    async def message(self, ctx, user: discord.User, *, msg=None):
+        """Make Kiara message a user."""
+        try:
+            await user.send(msg)
+            await ctx.send(f"Message sent to {user.mention}!")
+        except discord.Forbidden:
+            await ctx.send("The user has DMs disabled.")
+
+
     @commands.group(invoke_without_command=True, aliases=['purge'])
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int = 10):
