@@ -18,7 +18,7 @@ class Casino:
             if choice.lower() not in ['heads', 'tails']:
                 return await ctx.send("Please pick either `heads` or `tails`.")
         else:
-            choice = random.choice(['heads', 'tails'])
+            choice = 'heads'
 
         profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
         if profile.coins < amount:
