@@ -22,7 +22,7 @@ class Rng:
         async with ctx.typing():
             await ctx.message.delete()
             async with aiohttp.ClientSession() as session:
-                async with session.get('http://random.cat/meow') as r:
+                async with session.get('http://aws.random.cat/meow') as r:
                     if r.status == 200:
                         js = await r.json()
                         await ctx.send(js['file'])
