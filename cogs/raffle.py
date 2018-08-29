@@ -97,7 +97,8 @@ class Raffle:
         embed.add_field(name='Prize', value=str(reward or '?'))
         embed.add_field(name='Entry cost', value=str(cost or '?')+'g')
         embed.add_field(name='Entries', value=num_entries)
-        embed.add_field(name='Winner', value=f"<@{winner_id}>", inline=False)
+        winner = await self.bot.get_user_info(int(winner_id))
+        embed.add_field(name='Winner', value=f"<@{winner_id}> {winner}", inline=False)
         embed.timestamp = datetime.datetime.utcfromtimestamp(float(end))
         embed.set_footer(text=f'⏰ Ended')
         return embed
