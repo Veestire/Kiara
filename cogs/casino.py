@@ -37,6 +37,22 @@ class Casino:
                 profile.coins -= amount
             await profile.save(self.bot.db)
 
+    @commands.command()
+    async def russianroulette(self, ctx, *participants: discord.Member):
+        chamber = [0, 0, 0, 0, 0, 1]
+        random.shuffle(chamber)
+        participants = list(participants)
+        random.shuffle(participants)
+        for i, b in enumerate(chamber):
+            current = participants[i%len(participants)]
+            await ctx.send(f"{current} is next, type `shoot` or literally anything else")
+            msg = await self.bot.wait_for('message', check=lambda m: m.author in participants)
+            if b:
+                await ctx.send(f"{current} lost")
+                break
+            else:
+                await ctx.send('Lucky boi')
+
 
 def setup(bot):
     bot.add_cog(Casino(bot))
