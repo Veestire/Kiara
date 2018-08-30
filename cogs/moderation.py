@@ -196,11 +196,11 @@ class Moderation:
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
     async def userinfo(self, ctx, *, member: IDConverter):
-        member = ctx.guild.get_member(member) or await self.bot.get_user_info(member)
-
-        if member is None:
+        try:
+            member = ctx.guild.get_member(member) or await self.bot.get_user_info(member)
+        except discord.NotFound:
             return await ctx.send("Unknown user")
-
+        
         if member.id == 73389450113069056:
             member.joined_at = ctx.guild.created_at
 
