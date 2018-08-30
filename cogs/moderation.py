@@ -40,6 +40,18 @@ class MemberID(commands.Converter):
             return m.id
 
 
+class IDConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        try:
+            m = await commands.MemberConverter().convert(ctx, argument)
+            return m.id
+        except commands.BadArgument:
+            try:
+                return int(argument, base=10)
+            except ValueError:
+                raise commands.BadArgument(f"{argument} is not a valid member or member ID.") from None
+
+
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
         ban_list = await ctx.guild.bans()
@@ -183,16 +195,22 @@ class Moderation:
     @commands.command(aliases=['infouser'])
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
-    async def userinfo(self, ctx, *, member: discord.Member):
+    async def userinfo(self, ctx, *, member: IDConverter):
+        member = ctx.guild.get_member(member) or await self.bot.get_user_info(member)
+
+        if member is None:
+            return await ctx.send("Unknown user")
+
         if member.id == 73389450113069056:
             member.joined_at = ctx.guild.created_at
-            
+
         e = discord.Embed(title=f'{member} (ID: {member.id})', colour=discord.Colour.green())
         e.set_thumbnail(url=member.avatar_url_as(size=128))
-        e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
         e.add_field(name=f'Created', value=time.time_ago(member.created_at), inline=True)
-        e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
-        e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
+        if isinstance(member, discord.Member):
+            e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
+            e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
+            e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]), inline=False)
         await ctx.send(embed=e)
 
     @commands.command(aliases=['bumped'])
