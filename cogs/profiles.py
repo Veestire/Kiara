@@ -186,13 +186,6 @@ class Profiles:
             role = self.get_top_color(member.roles) if ctx.guild else None
             if role:
                 e.colour = role.color
-
-        econ_cog = self.bot.get_cog("Economy")
-        if econ_cog:
-            inventory = await econ_cog.get_inventory(ctx.author.id)
-            if inventory:
-                e.add_field(name="Inventory", value=' '.join([f'<:bs:{item["icon"]}>' for item in inventory]))
-
         await ctx.send(embed=e)
 
     @commands.command(hidden=True)
