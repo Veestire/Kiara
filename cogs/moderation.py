@@ -311,7 +311,7 @@ class Moderation:
 
     @commands.command()
     @commands.has_role('Staff')
-    async def kiarahistory(self, ctx, member: IDConverter, limit: int=100):
+    async def kiarahistory(self, ctx, member: IDConverter, limit: int=15):
         try:
             member = self.bot.get_user(member) or await self.bot.get_user_info(member)
         except discord.NotFound:
