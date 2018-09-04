@@ -319,9 +319,10 @@ class Moderation:
         pag = commands.Paginator('```diff')
 
         async for m in member.history(reverse=True, limit=limit):
+            content = ''.join(m.content.replace('`', '\`').splitlines())
             pag.add_line(
                 f"{'-' if m.author.id == self.bot.user.id else '+'} {m.created_at.strftime('%d-%b-%Y %H:%M:%S')} "
-                f"{m.author.name}: {''.join(m.content.splitlines())}")
+                f"{m.author.name}: {content}")
         for page in pag.pages:
             await ctx.send(page)
 
