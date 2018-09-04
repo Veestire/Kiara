@@ -309,5 +309,20 @@ class Moderation:
         await ctx.channel.delete_messages(messages)
         await ctx.send(f'Deleted {len(messages)} messages', delete_after=4)
 
+    @commands.command()
+    @commands.has_role('Staff')
+    async def kiarahistory(self, ctx, member: IDConverter, limit: int=100):
+        try:
+            member = self.bot.get_user(member) or await self.bot.get_user_info(member)
+        except discord.NotFound:
+            return await ctx.send("Unknown user")
+        pag = commands.Paginator('```diff')
+
+        async for m in member.history(reverse=True, limit=limit):
+            pag.add_line(
+                f"{'-' if m.author.id == self.bot.user.id else '+'} {m.author.name}: {''.join(m.content.splitlines())}")
+        for page in pag.pages:
+            await ctx.send(page)
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
