@@ -32,6 +32,7 @@ extra_colors = [
     ("Seductive Embrace", 383816911072395269,60),
     ("A Story Untold", 360785400798904331,60),
     ("Reflections Of A Day Long Gone", 360791701025062913,60),
+    ("Heaven's Dewdrop", 486441479183794176,60),
     ("A Darkness Only Seen Within", 360788545759084554,100),
     ("Spring Petal Dancing In The Mist", 403591076532846596,100),
     ("Lost in the Orchid Garden", 403583624558936065,100),
