@@ -41,7 +41,12 @@ class Raffle:
             print(e)
 
     async def update_raffle(self, message_id):
-        message = await self.raffle_channel.get_message(message_id)
+        try:
+            message = await self.raffle_channel.get_message(message_id)
+        except discord.NotFound:
+            # Message was deleted
+            return await self.bot.redis.delete(f'raffle:{message_id}')
+
         end = await self.bot.redis.hget(f'raffle:{message_id}', 'end', encoding='utf8')
         end = datetime.datetime.utcfromtimestamp(int(end))
 
