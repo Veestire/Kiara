@@ -151,6 +151,7 @@ class Economy:
         """Buy an item from the shop"""
         item_name = item_name.lower()
         role = discord.utils.find(lambda x: item_name in x.name.lower(), ctx.guild.roles)
+        owned = await self.get_owned_colors(ctx.author.id)
 
         if not role:
             return await ctx.send(f"{item_name} is not a valid role.")
@@ -160,9 +161,8 @@ class Economy:
             if item:
                 break
         else:
-            return await ctx.send(f"{role.name} is not for sale.")
-
-        owned = await self.get_owned_colors(ctx.author.id)
+            if role.id not in owned:
+                return await ctx.send(f"{role.name} is not for sale.")
 
         # TODO: Handle non role items
         if item.data not in owned:
@@ -186,14 +186,22 @@ class Economy:
         await ctx.author.add_roles(role)
 
     @commands.guild_only()
-    @commands.command(aliases=['colors'])
-    async def colours(self, ctx):
-        """Display your owned colors"""
+    @commands.command(aliases=['colors', 'setcolor', 'swapcolor', 'setcolour', 'swapcolour'])
+    async def colours(self, ctx, *, colour=None):
+        """Display your owned colors, or swap your color for a previously owned one."""
         owned = await self.get_owned_colors(ctx.author.id)
-        if owned:
-            await ctx.send("You own the following colors:\n"+'\n'.join([f"<@&{role}>" for role in owned]))
+        if colour:
+            role = discord.utils.find(lambda x: colour.lower() in x.name.lower(), ctx.guild.roles)
+            if not role:
+                return await ctx.send("This isn't a valid color")
+            if role.id in owned:
+                await ctx.author.add_roles(role)
+                await ctx.send(f"I'll swap your color to <@&{role.id}>")
         else:
-            await ctx.send("You don't own any colors at the moment.")
+            if owned:
+                await ctx.send("You own the following colors:\n"+'\n'.join([f"<@&{role}>" for role in owned]))
+            else:
+                await ctx.send("You don't own any colors at the moment.")
 
     def init_shop(self):
         self.shops = [
