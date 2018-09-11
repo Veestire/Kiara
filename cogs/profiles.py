@@ -156,6 +156,7 @@ class Profiles:
         if not role:
             return await ctx.send("Unknown color/role")
         await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({member.id}, {role.id})')
+        await ctx.send(f"Gave {member} the role <@&{role.id}>")
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
