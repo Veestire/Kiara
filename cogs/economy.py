@@ -165,7 +165,7 @@ class Economy:
                 return await ctx.send(f"{role.name} is not for sale.")
 
         # TODO: Handle non role items
-        if item.data not in owned:
+        if role.id not in owned:
             async with self.profiles.get_lock(ctx.author.id):
                 profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
                 if profile.coins >= item.cost:
