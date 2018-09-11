@@ -217,6 +217,7 @@ class Profiles:
 
     @commands.command(hidden=True, aliases=['leaderboards', 'ranks', 'rankings'])
     async def leaderboard(self, ctx, page: int = 1):
+        """Display the server leaderboard"""
         guild = self.bot.get_guild(215424443005009920)
         qry = f"""
         select `user_id`, `level`, `experience`, `rank` FROM
@@ -237,7 +238,7 @@ class Profiles:
 
     @commands.command(aliases=['experience'])
     async def xp(self, ctx, *, member: discord.Member = None):
-        """Shows your exp"""
+        """Check your xp"""
         if not member:
             member = ctx.author
         p = await self.get_profile(member.id, ('level', 'experience'))
