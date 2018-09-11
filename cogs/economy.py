@@ -176,13 +176,13 @@ class Economy:
                 await profile.save(self.bot.db)
             await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({ctx.author.id}, {item.data})')
         else:
-            await ctx.send(f"I'll swap your color to <@&{item.data}>")
+            await ctx.send(f"I'll swap your color to <@&{role.id}>")
 
         topcolor = self.profiles.get_top_color(ctx.author.roles)
         if topcolor:
             await ctx.author.remove_roles(topcolor)
 
-        role = discord.utils.get(ctx.guild.roles, id=item.data)
+        role = discord.utils.get(ctx.guild.roles, id=role.id)
         await ctx.author.add_roles(role)
 
     @commands.guild_only()
