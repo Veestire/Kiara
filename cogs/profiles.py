@@ -149,6 +149,14 @@ class Profiles:
             await profile.save(self.bot.db)
             await ctx.send(f"{member} now has {profile.coins} gold")
 
+    @commands.command(hidden=True, aliases=['givecolour'])
+    @commands.has_permissions(administrator=True)
+    async def givecolor(self, ctx, member: discord.Member, *, color):
+        role = discord.utils.find(lambda x: color.lower() in x.name.lower(), ctx.guild.roles)
+        if not role:
+            return await ctx.send("Unknown color/role")
+        await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({member.id}, {role.id})')
+
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def takegold(self, ctx, member: discord.Member, gold: int):
