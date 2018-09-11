@@ -195,6 +195,9 @@ class Economy:
             if not role:
                 return await ctx.send("This isn't a valid color")
             if role.id in owned:
+                topcolor = self.profiles.get_top_color(ctx.author.roles)
+                if topcolor:
+                    await ctx.author.remove_roles(topcolor)
                 await ctx.author.add_roles(role)
                 await ctx.send(f"I'll swap your color to <@&{role.id}>")
         else:
