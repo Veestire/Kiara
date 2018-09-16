@@ -250,6 +250,15 @@ class Moderation:
             await ctx.send(msg)
         await ctx.message.delete()
 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def edit(self, ctx, message_id, *, msg=None):
+        """Edit one of Kiara's old messages.
+        Doesn't support images."""
+        message = await ctx.channel.get_message(message_id)
+        await message.edit(content=msg)
+        await ctx.message.delete()
+
     @commands.command(aliases=['dm'])
     @commands.has_permissions(administrator=True)
     async def message(self, ctx, user: discord.User, *, msg=None):
