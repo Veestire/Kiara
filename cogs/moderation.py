@@ -239,7 +239,7 @@ class Moderation:
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def say(self, ctx, *, msg=None):
-        """Make Kiara say something"""
+        """Make Kiara say something."""
         if ctx.message.attachments:
             file = BytesIO()
             att = ctx.message.attachments[0]
