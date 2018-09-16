@@ -104,8 +104,7 @@ class Economy:
         """Claim your daily gold"""
         async with self.profiles.get_lock(ctx.author.id):
             profile = await self.profiles.get_profile(ctx.author.id, ('coins', 'level'))
-            amount = random.randint(1, 5)
-            amount *= int(1 + .2 * (profile.level//5))
+            amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)))
             profile.coins += amount
             await profile.save(self.bot.db)
         await ctx.send(f"You got {amount} gold as daily reward.")
