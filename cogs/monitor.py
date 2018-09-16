@@ -144,7 +144,8 @@ class Monitor:
             for u, c, a in rows[page * 5:page * 5 + 5]:
                 member = ctx.bot.get_user(u)
                 a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
-                em.add_field(name=member.display_name if member else u, value=c or '-' + a, inline=False)
+                val = c or '-' + a
+                em.add_field(name=member.display_name if member else u, value=val[:1024], inline=False)
             em.set_footer(text=f'Page {page+1}')
             return em
 
