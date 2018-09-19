@@ -31,10 +31,10 @@ class Casino:
             profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
 
             if win == choice:
-                await ctx.send(f"{emote} The coin landed on {win}.\nCongrats you won {amount} gold.")
+                await ctx.send(f"The coin landed on {win}. {emote}\nCongrats you won {amount} gold.")
                 profile.coins += amount
             else:
-                await ctx.send(f"{emote} The coin landed on {win}.\nSorry, you lost {amount} gold")
+                await ctx.send(f"The coin landed on {win}. {emote}\nSorry, you lost {amount} gold")
                 profile.coins -= amount
             await profile.save(self.bot.db)
 
