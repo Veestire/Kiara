@@ -378,7 +378,7 @@ class Moderation:
 
     @commands.command()
     @commands.has_role('Staff')
-    async def warns(self, ctx, member: MemberID):
+    async def warns(self, ctx, member: IDConverter):
         warns = await self.get_all_warns(member)
         member = await self.bot.get_user_info(member)
 
