@@ -36,8 +36,8 @@ class Stafflog:
             f'SELECT message_id FROM stafflog WHERE id={case_id}')
         msg = await self.bot.get_channel(LOG_CHANNEL).get_message(m_id)
         em = msg.embeds[0].to_dict()
-        # Keep the old info, so the username doesn't change in case the it's changed.
-        em['description'] = '\n'.join(em['description'].split('\n')[:2]) + f"\nReason: {reason}"
+        # Keep the old info, so the username doesn't change in case it's changed.
+        em['description'] = '\n'.join(em['description'].split('\n')[:2]) + f"\nReason: {ctx.author}: {reason}"
         await msg.edit(embed=discord.Embed.from_data(em))
         await ctx.message.delete()
 

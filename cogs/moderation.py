@@ -108,7 +108,7 @@ class Moderation:
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
             try:
-                await ctx.guild.ban(discord.Object(id=member), reason=reason)
+                await ctx.guild.ban(discord.Object(id=member), reason=f"{ctx.author}: {reason}" if reason else None)
                 member = await self.bot.get_user_info(member)
                 await ctx.send(f'Banned {member}!')
             except Exception as e:
