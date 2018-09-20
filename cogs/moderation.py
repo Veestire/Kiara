@@ -74,6 +74,18 @@ class Moderation:
         self.timers = bot.get_cog('Timers')
         self.stafflog = bot.get_cog('Stafflog')
 
+    async def get_recent_warns(self, user_id):
+        qry = 'SELECT * FROM warns ' \
+              'WHERE user_id=%s AND date > (%s)'
+        warns = await self.bot.db.fetchdicts(qry, (user_id, datetime.datetime.utcnow()-datetime.timedelta(days=30)))
+        return warns
+
+    async def get_all_warns(self, user_id):
+        qry = 'SELECT * FROM warns ' \
+              'WHERE user_id=%s'
+        warns = await self.bot.db.fetchdicts(qry, (user_id,))
+        return warns
+
     @commands.command()
     @commands.has_any_role('Staff')
     async def kick(self, ctx, member: MemberID, *, reason=None):
@@ -211,6 +223,9 @@ class Moderation:
             e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
             e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
             e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[1:]]) or "None", inline=False)
+        warns = await self.get_recent_warns(member.id)
+        if warns:
+            e.add_field(name=f'Recent warnings', value='\n'.join([f"- {warn['reason']}" for warn in warns]) or "None", inline=False)
         await ctx.send(embed=e)
 
     @commands.command(aliases=['bumped'])
@@ -334,6 +349,47 @@ class Moderation:
                 f"{m.author.name}: {content}")
         for page in pag.pages:
             await ctx.send(page)
+
+    @commands.command()
+    @commands.has_role('Staff')
+    async def warn(self, ctx, member: discord.Member, *, reason):
+        qry = "INSERT INTO warns (date, user_id, issuer, reason) VALUES (%s, %s, %s, %s)"
+        await self.bot.db.execute(qry, (datetime.datetime.utcnow(), member.id, ctx.author.id, reason))
+
+        warns = await self.get_recent_warns(member.id)
+        all_warns = await self.get_all_warns(member.id)
+
+        em = discord.Embed(title=f"{member} (ID: {member.id})")
+        em.add_field(name="Warned by", value=ctx.author)
+        em.add_field(name="Reason", value=reason)
+
+        if len(warns) >= 3:
+            em.colour = 0xbb2124
+        elif len(warns) >= 2:
+            em.colour = 0xf0ad4e
+        else:
+            em.colour = 0xe6f266
+
+        em.set_footer(text=f"{len(warns)} recent warning(s), {len(all_warns)} total")
+        em.timestamp = datetime.datetime.utcnow()
+
+        warn_channel = ctx.guild.get_channel(488632843711414282)
+        await warn_channel.send(embed=em)
+
+    @commands.command()
+    @commands.has_role('Staff')
+    async def warns(self, ctx, member: MemberID):
+        warns = await self.get_all_warns(member)
+        member = await self.bot.get_user_info(member)
+
+        em = discord.Embed(title=f"Warns from {member} (ID: {member.id})")
+        for warning in warns[:25]:
+            issuer = self.bot.get_user(warning['issuer']) or warning['issuer']
+            em.add_field(name=f"Warn by {issuer} - {warning['date']}", value=warning['reason'])
+
+        em.timestamp = datetime.datetime.utcnow()
+
+        await ctx.send(embed=em)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
