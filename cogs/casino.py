@@ -30,7 +30,7 @@ class Casino:
         async with self.profiles.get_lock(ctx.author.id):
             profile = await self.profiles.get_profile(ctx.author.id, ('coins',))
 
-            if win == choice:
+            if win == choice.lower():
                 await ctx.send(f"The coin landed on {win}. {emote}\nCongrats you won {amount} gold.")
                 profile.coins += amount
             else:
