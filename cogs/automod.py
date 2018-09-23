@@ -13,7 +13,7 @@ class Automod:
         self.bot = bot
         self.inviteregex = re.compile(INVITE_REGEX)
 
-    async def on_message(self, msg):
+    async def check_message(self, msg):
         if msg.guild is None:
             return
 
@@ -25,6 +25,12 @@ class Automod:
                 await msg.delete()
                 await msg.channel.send(f"{msg.author.mention} you sent an invite link, I deleted it for you.")
                 await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=348331525479071745))
+
+    async def on_message(self, msg):
+        await self.check_message(msg)
+
+    async def on_message_edit(self, before, after):
+        await self.check_message(after)
 
     async def on_member_join(self, member):
         if member.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
