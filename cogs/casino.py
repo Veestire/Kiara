@@ -10,7 +10,7 @@ class Casino:
         self.bot = bot
         self.profiles = bot.get_cog("Profiles")
 
-    @commands.command()
+    @commands.command(aliases=['cf'])
     async def coinflip(self, ctx, amount: int, choice=None):
         if amount <= 0:
             return await ctx.send("Please bet more than 0")
