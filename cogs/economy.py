@@ -100,24 +100,42 @@ class Economy:
     @basic_cooldown(86400)
     @commands.guild_only()
     @commands.command(aliases=['daily'])
-    async def dailies(self, ctx):
-        """Claim your daily gold"""
+    async def dailies(self, ctx, *, receiver: discord.Member=None):
+        """Claim your daily gold, or give it to someone else."""
+        # Prevent lock freeze
+        if receiver and receiver.id == ctx.author.id:
+            receiver = None
+
         async with self.profiles.get_lock(ctx.author.id):
             profile = await self.profiles.get_profile(ctx.author.id, ('coins', 'level'))
             amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)))
-            profile.coins += amount
-            await profile.save(self.bot.db)
-        await ctx.send(f"You got {amount} gold as daily reward.")
+            if receiver:
+                async with self.profiles.get_lock(receiver.id):
+                    profile2 = await self.profiles.get_profile(receiver.id, ('coins', 'level'))
+                    profile2.coins += amount
+                    await profile2.save(self.bot.db)
+            else:
+                profile.coins += amount
+                await profile.save(self.bot.db)
+
+        if receiver:
+            await ctx.send(f"You gave <@{receiver.id}> {amount} gold as daily reward.")
+        else:
+            await ctx.send(f"You got {amount} gold as daily reward.")
+
 
     @dailies.error
     async def dailies_error(self, ctx, error):
-        m, s = divmod(error.retry_after, 60)
-        h, m = divmod(m, 60)
+        if isinstance(error, commands.BadArgument):
+            await self.bot.redis.delete(f"cooldown:{ctx.author.id}:{ctx.command.qualified_name}")
+        else:
+            m, s = divmod(error.retry_after, 60)
+            h, m = divmod(m, 60)
 
-        t = f"{h:.0f} hour(s)" if h else f"{m:.0f} minute(s) and {s:.0f} second(s)" if m else f"{s:.0f} second(s)"
-        msg = "You already collected your dailies.\nTry again in " + t
+            t = f"{h:.0f} hour(s)" if h else f"{m:.0f} minute(s) and {s:.0f} second(s)" if m else f"{s:.0f} second(s)"
+            msg = "You already collected your dailies.\nTry again in " + t
 
-        await ctx.send(msg)
+            await ctx.send(msg)
 
     async def get_owned_colors(self, user_id):
         owned = itertools.chain(*await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user_id}'))
