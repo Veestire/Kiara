@@ -274,6 +274,18 @@ class Economy:
         else:
             return await ctx.send("Transfer cancelled.")
 
+    async def get_inventory(self, user_id):
+        query = "SELECT item.* FROM inventory inv " \
+                "INNER JOIN items item ON inv.item_id = item.id " \
+                f"WHERE inv.user_id = %s"
+        items = await self.bot.db.fetchdicts(query, (user_id,))
+        return items
+
+    @commands.command(aliases=['inv'])
+    async def inventory(self, ctx, user:discord.User = None):
+        items = await self.get_inventory(ctx.author.id)
+        items = [f'<:bs:{item["icon"]}>' for item in items]
+        await ctx.send(' '.join(items))
 
 def setup(bot):
     bot.add_cog(Economy(bot))
