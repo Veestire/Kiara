@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import re
 
@@ -13,7 +14,22 @@ class Automod:
         self.bot = bot
         self.inviteregex = re.compile(INVITE_REGEX)
 
-    async def check_message(self, msg):
+        self.bg_task = bot.loop.create_task(self.update_user_log())
+
+    def __unload(self):
+        self.bg_task.cancel()
+
+    async def update_user_log(self):
+        await self.bot.wait_until_ready()
+        channel = self.bot.get_channel(497088811486937098)
+        try:
+            while not self.bot.is_closed():
+                await channel.edit(name=f"Total Users > {len(channel.guild.members)}")
+                await asyncio.sleep(3600)
+        except Exception as e:
+            print(e)
+
+    async def invite_check(self, msg):
         if msg.guild is None:
             return
 
@@ -27,10 +43,10 @@ class Automod:
                 await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=348331525479071745))
 
     async def on_message(self, msg):
-        await self.check_message(msg)
+        await self.invite_check(msg)
 
     async def on_message_edit(self, before, after):
-        await self.check_message(after)
+        await self.invite_check(after)
 
     async def on_member_join(self, member):
         if member.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
