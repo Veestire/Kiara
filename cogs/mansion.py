@@ -12,7 +12,7 @@ class Mansion:
     def __init__(self, bot):
         self.bot = bot
 
-    @basic_cooldown(172800)  # 48 hours
+    @basic_cooldown(86400)  # 24 hours
     @commands.guild_only()
     @commands.command()
     async def investigate(self, ctx):
@@ -22,7 +22,7 @@ class Mansion:
         rand = random.random()
         if rand < 0.5:  # Mid tier reward(50%)
             msg = "*After working your way through most of the mansion, you stumble across... " \
-                  "A handful of old, dusty trinkets. Maybe there worth something...*\n" \
+                  "A handful of old, dusty trinkets. Maybe they're worth something...*\n" \
                   "**+15 Gold**"
             async with profiles.get_lock(ctx.author.id):
                 profile = await profiles.get_profile(ctx.author.id, ('coins',))
@@ -30,11 +30,11 @@ class Mansion:
                 await profile.save(self.bot.db)
         elif rand < 0.8:  # Low tier reward (30%)
             msg = "*After absentmindedly investigating a few places around the mansion, you stumble across... " \
-                  "A single coin... Riveting.*\n" \
-                  "**+1 Gold**"
+                  "A few coins... Riveting.*\n" \
+                  "**+5 Gold**"
             async with profiles.get_lock(ctx.author.id):
                 profile = await profiles.get_profile(ctx.author.id, ('coins',))
-                profile.coins += 1
+                profile.coins += 5
                 await profile.save(self.bot.db)
         elif rand < 0.95:  # High tier reward (15%)
             msg = "*After some hours of meticulously searching through every room and drawer, you stumble across... " \
