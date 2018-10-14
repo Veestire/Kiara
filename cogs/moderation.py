@@ -375,6 +375,7 @@ class Moderation:
 
         warn_channel = ctx.guild.get_channel(488632843711414282)
         await warn_channel.send(embed=em)
+        await ctx.message.add_reaction('Yes:393865045005697034')
 
     @commands.command()
     @commands.has_role('Staff')
