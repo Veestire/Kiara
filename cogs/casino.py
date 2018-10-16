@@ -12,6 +12,7 @@ class Casino:
 
     @commands.command(aliases=['cf'])
     async def coinflip(self, ctx, amount: int, choice=None):
+        """Bet some money on flipping a coin"""
         if amount <= 0:
             return await ctx.send("Please bet more than 0")
         if choice:
