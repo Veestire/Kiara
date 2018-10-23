@@ -89,6 +89,7 @@ class Moderation:
     @commands.command()
     @commands.has_any_role('Staff')
     async def kick(self, ctx, member: MemberID, *, reason=None):
+        """Kick a user."""
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'kick_members', None):
             try:
@@ -105,6 +106,7 @@ class Moderation:
     @commands.command()
     @commands.has_any_role('Staff')
     async def ban(self, ctx, member: MemberID, *, reason=None):
+        """Ban a user."""
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
             try:
@@ -122,6 +124,8 @@ class Moderation:
     @commands.command(aliases=['multiban'])
     @commands.has_any_role('Staff')
     async def massban(self, ctx, *members: MemberID):
+        """Mass ban a ton of users at once.
+        Using user ids is recommended."""
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
             for member in members:
@@ -138,6 +142,7 @@ class Moderation:
     @commands.command()
     @commands.has_any_role('Staff')
     async def unban(self, ctx, member: BannedMember, *, reason=None):
+        """Unban a user."""
         permissions = ctx.channel.permissions_for(ctx.author)
         if getattr(permissions, 'ban_members', None):
             try:
@@ -153,6 +158,8 @@ class Moderation:
     @commands.command()
     @commands.has_role('Staff')
     async def mute(self, ctx, member: discord.Member, minutes: int = 5, *, reason=None):
+        """Mute a user.
+        Defaults to 5 minutes."""
         await member.add_roles(discord.utils.get(ctx.guild.roles, id=MUTED_ROLE))
         await self.timers.create_timer('unmute', datetime.datetime.utcnow() + datetime.timedelta(minutes=minutes),
                                        [ctx.guild.id, member.id])
@@ -335,7 +342,9 @@ class Moderation:
 
     @commands.command()
     @commands.has_role('Staff')
-    async def kiarahistory(self, ctx, member: IDConverter, limit: int=15):
+    async def kiarahistory(self, ctx, member: IDConverter, limit: int = 15):
+        """Get someone's chat history with Kiara.
+        Defaults to max 15 messages"""
         try:
             member = self.bot.get_user(member) or await self.bot.get_user_info(member)
         except discord.NotFound:
@@ -350,11 +359,19 @@ class Moderation:
         for page in pag.pages:
             await ctx.send(page)
 
+    async def warn_user(self, user_id, issuer_id, reason):
+        qry = "INSERT INTO warns (date, user_id, issuer, reason) VALUES (%s, %s, %s, %s)"
+        await self.bot.db.execute(qry, (datetime.datetime.utcnow(), user_id, issuer_id, reason))
+
     @commands.command()
     @commands.has_role('Staff')
     async def warn(self, ctx, member: discord.Member, *, reason):
-        qry = "INSERT INTO warns (date, user_id, issuer, reason) VALUES (%s, %s, %s, %s)"
-        await self.bot.db.execute(qry, (datetime.datetime.utcnow(), member.id, ctx.author.id, reason))
+        """Warn a user.
+        The warning will show up in #s-warns for mods to see.
+        
+        A warning is considered "recent" if it hasn't been at least 30 days since the warning.
+        """
+        await self.warn_user(member.id, ctx.author.id, reason)
 
         warns = await self.get_recent_warns(member.id)
         all_warns = await self.get_all_warns(member.id)
@@ -380,6 +397,7 @@ class Moderation:
     @commands.command()
     @commands.has_role('Staff')
     async def warns(self, ctx, member: IDConverter):
+        """Show all warnings of a user, no matter how recent it is."""
         warns = await self.get_all_warns(member)
         member = await self.bot.get_user_info(member)
 

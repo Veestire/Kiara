@@ -41,6 +41,7 @@ class Casino:
 
     @commands.command()
     async def russianroulette(self, ctx, *participants: discord.Member):
+        """Play an innocent game of russian roulette. Winner dies."""
         chamber = [0, 0, 0, 0, 0, 1]
         random.shuffle(chamber)
         participants = list(participants)
