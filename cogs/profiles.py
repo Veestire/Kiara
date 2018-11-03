@@ -132,10 +132,6 @@ class Profiles:
                         rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level - 5, 1)))
                         await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
-                if profile.level == 10:
-                    role = discord.utils.get(msg.guild.roles, id=457213160504426496)
-                    await msg.author.add_roles(role)
-
             await profile.save(self.bot.db)
 
     async def on_member_join(self, member):
