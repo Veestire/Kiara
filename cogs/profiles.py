@@ -121,6 +121,10 @@ class Profiles:
                 profile.experience -= needed
                 profile.coins += levelup_gold(profile.level)
 
+                # Temporary faithful role, the whole role idea will change in the future.
+                if profile.level == 3:
+                    await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=457213160504426496))
+
                 if profile.level % 5 == 0:
                     role = discord.utils.get(msg.guild.roles, name=str(profile.level))
                     if role:
