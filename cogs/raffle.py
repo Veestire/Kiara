@@ -122,7 +122,7 @@ class Raffle:
     async def on_raw_reaction_add(self, payload):
         if payload.user_id == self.bot.user.id:
             return
-        if payload.channel_id != 467614160251912193:
+        if payload.channel_id not in [467614160251912193, 508287405061701633]:
             return
         if str(payload.emoji) != '💎':
             return
