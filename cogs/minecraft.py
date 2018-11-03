@@ -17,7 +17,8 @@ class Minecraft:
         try:
             await ctx.author.send(await ctx.redis.get(f'snippet:minecraftrules1', encoding='utf8'))
             await ctx.author.send(await ctx.redis.get(f'snippet:minecraftrules2', encoding='utf8'))
-            await ctx.send("I sent you a DM!")
+            if ctx.guild:
+                await ctx.send("I sent you a DM!")
         except discord.Forbidden:
             if ctx.guild:
                 await ctx.send("Please use this command in a DM with me.")
