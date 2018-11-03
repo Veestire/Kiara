@@ -28,9 +28,9 @@ class Minecraft:
         member = guild.get_member(ctx.author.id)
         if discord.utils.get(member.roles, id=457213160504426496) is None:
             return await ctx.send("You need to be at least level 3.")
-        
-        await ctx.db.execute("INSERT INTO minecraft_whitelist (user_id, username) VALUES (%s, %s)",
-                             (ctx.author.id, minecraft_username))
+
+        await self.bot.db.execute("INSERT INTO minecraft_whitelist (user_id, username) VALUES (%s, %s)",
+                                  (ctx.author.id, minecraft_username))
 
         ch = self.bot.get_channel(508326036845363227)
         await ch.send(embed=discord.Embed(title=f"{ctx.author} wants to get whitelisted.", description=f"`{minecraft_username}`"))
