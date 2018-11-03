@@ -8,9 +8,12 @@ class Minecraft:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.has_role('Faithful')
     @commands.command()
     async def minecraft(self, ctx):
+        guild = self.bot.get_guild(215424443005009920) or ctx.guild
+        member = guild.get_member(ctx.author.id)
+        if discord.utils.get(member.roles, id=457213160504426496) is None:
+            return await ctx.send("You need to be at least level 3.")
         try:
             await ctx.author.send(await ctx.redis.get(f'snippet:minecraftrules1', encoding='utf8'))
             await ctx.author.send(await ctx.redis.get(f'snippet:minecraftrules2', encoding='utf8'))
@@ -19,9 +22,13 @@ class Minecraft:
             if ctx.guild:
                 await ctx.send("Please use this command in a DM with me.")
 
-    @commands.has_role('Faithful')
     @commands.command()
     async def confirm(self, ctx, *, minecraft_username):
+        guild = self.bot.get_guild(215424443005009920) or ctx.guild
+        member = guild.get_member(ctx.author.id)
+        if discord.utils.get(member.roles, id=457213160504426496) is None:
+            return await ctx.send("You need to be at least level 3.")
+        
         await ctx.db.execute("INSERT INTO minecraft_whitelist (user_id, username) VALUES (%s, %s)",
                              (ctx.author.id, minecraft_username))
 
