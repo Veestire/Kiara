@@ -71,7 +71,7 @@ class Raffle:
     async def createraffle(self, ctx, cost: int, hours: int, *, reward):
         if ctx.channel.id not in [467614160251912193,508287405061701633]:
             return await ctx.send("Use this in one of the raffle channels")
-        await ctx.delete()
+        await ctx.message.delete()
         message = await ctx.send('setting up raffle..')
         await message.add_reaction('💎')
 
