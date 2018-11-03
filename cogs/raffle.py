@@ -18,6 +18,7 @@ class Raffle:
         self.bot = bot
         self.profiles = bot.get_cog("Profiles")
         self.raffle_channel = None
+        self.alt_raffle_channel = None
         self.raffles = []
         self.bg_task = bot.loop.create_task(self.raffle_interval())
 
@@ -28,6 +29,7 @@ class Raffle:
         await self.bot.wait_until_ready()
         # Load the channel and raffles from redis
         self.raffle_channel = self.bot.get_channel(467614160251912193)
+        self.alt_raffle_channel = self.bot.get_channel(508287405061701633)
         self.raffles = await self.bot.redis.keys('raffle:*', encoding='utf8')
         try:
             while not self.bot.is_closed():
@@ -44,15 +46,21 @@ class Raffle:
         try:
             message = await self.raffle_channel.get_message(message_id)
         except discord.NotFound:
-            # Message was deleted
-            return await self.bot.redis.delete(f'raffle:{message_id}')
+            try:
+                message = await self.alt_raffle_channel.get_message(message_id)
+            except discord.NotFound:
+                # Message was deleted
+                return await self.bot.redis.delete(f'raffle:{message_id}')
 
         end = await self.bot.redis.hget(f'raffle:{message_id}', 'end', encoding='utf8')
         end = datetime.datetime.utcfromtimestamp(int(end))
 
         if datetime.datetime.utcnow() >= end:
             entries = await self.bot.redis.lrange(f'raffle_entries:{message_id}', 0, -1, encoding='utf8') or ['???']
-            winner = random.choice(entries)
+            for i in range(20):
+                winner = random.choice(entries)
+                if self.bot.get_user(int(winner)):
+                    break
             await message.edit(embed=await self.generate_end_embed(message_id, winner))
             await self.bot.redis.delete(f'raffle:{message_id}')
         else:
@@ -61,7 +69,10 @@ class Raffle:
     @commands.has_role('Staff')
     @commands.command()
     async def createraffle(self, ctx, cost: int, hours: int, *, reward):
-        message = await self.raffle_channel.send('setting up raffle..')
+        if ctx.channel.id not in [467614160251912193,508287405061701633]:
+            return await ctx.send("Use this in one of the raffle channels")
+        await ctx.delete()
+        message = await ctx.send('setting up raffle..')
         await message.add_reaction('💎')
 
         raffle_id = await self.bot.redis.incr('rafflecount')
