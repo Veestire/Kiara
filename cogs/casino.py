@@ -99,21 +99,21 @@ class Casino:
             if hitcolor != None:
                 if hitcolor == choice.lower():
                     if choice.lower() == "green":
-                        await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}")
-                        await ctx.send(f"{pointer[0]} {pointer[1]} {pointer[0]}")
-                        await ctx.send(f"It landed on {hitcolor}! You win {amount*15} gold!")
+                        await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}"
+                                       f"{pointer[0]} {pointer[1]} {pointer[0]}"
+                                       f"It landed on {hitcolor}! You win {amount*15} gold!")
                         profile.coins += (amount*10)
 
                     else:
-                        await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}")
-                        await ctx.send(f"{pointer[0]} {pointer[1]} {pointer[0]}")
-                        await ctx.send(f"The roulette landed on {hit}! You bet on {hitcolor}, you win {amount*2} gold!")
+                        await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}"
+                                       f"{pointer[0]} {pointer[1]} {pointer[0]}"
+                                       f"The roulette landed on {hit}! You bet on {hitcolor}, you win {amount*2} gold!")
                         profile.coins += (amount*2)
 
                 else:
-                    await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}")
-                    await ctx.send(f"{pointer[0]} {pointer[1]} {pointer[0]}")
-                    await ctx.send(f"The roulette landed on {hit} which is {hitcolor}! Sorry, you lose {amount} gold.")
+                    await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}"
+                                   f"{pointer[0]} {pointer[1]} {pointer[0]}"
+                                   f"The roulette landed on {hit} which is {hitcolor}! Sorry, you lose {amount} gold.")
                     profile.coins -= amount
 
             await profile.save(self.bot.db)
