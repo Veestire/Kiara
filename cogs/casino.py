@@ -102,13 +102,13 @@ class Casino:
                         await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}\n"
                                        f"{pointer[0]} {pointer[1]} {pointer[0]}\n"
                                        f"It landed on {hitcolor}! You win {amount*15} gold!")
-                        profile.coins += (amount*10)
+                        profile.coins += (amount*15)
 
                     else:
                         await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}\n"
                                        f"{pointer[0]} {pointer[1]} {pointer[0]}\n"
-                                       f"The roulette landed on {hit}! You bet on {hitcolor}, you win {amount*2} gold!")
-                        profile.coins += (amount*2)
+                                       f"The roulette landed on {hit}! You bet on {hitcolor}, you win {amount} gold!")
+                        profile.coins += (amount)
 
                 else:
                     await ctx.send(f"{spinemotes[val1]} {spinemotes[hit]} {spinemotes[val3]}\n"
