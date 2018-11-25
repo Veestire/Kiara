@@ -363,21 +363,11 @@ class Moderation:
         qry = "INSERT INTO warns (date, user_id, issuer, reason) VALUES (%s, %s, %s, %s)"
         await self.bot.db.execute(qry, (datetime.datetime.utcnow(), user_id, issuer_id, reason))
 
-    @commands.command()
-    @commands.has_role('Staff')
-    async def warn(self, ctx, member: discord.Member, *, reason):
-        """Warn a user.
-        The warning will show up in #s-warns for mods to see.
-        
-        A warning is considered "recent" if it hasn't been at least 30 days since the warning.
-        """
-        await self.warn_user(member.id, ctx.author.id, reason)
+        warns = await self.get_recent_warns(user_id)
+        all_warns = await self.get_all_warns(user_id)
 
-        warns = await self.get_recent_warns(member.id)
-        all_warns = await self.get_all_warns(member.id)
-
-        em = discord.Embed(title=f"{member} (ID: {member.id})")
-        em.add_field(name="Warned by", value=ctx.author)
+        em = discord.Embed(title=f"{self.bot.get_user(user_id)} (ID: {user_id})")
+        em.add_field(name="Warned by", value=self.bot.get_user(issuer_id))
         em.add_field(name="Reason", value=reason)
 
         if len(warns) >= 3:
@@ -390,8 +380,18 @@ class Moderation:
         em.set_footer(text=f"{len(warns)} recent warning(s), {len(all_warns)} total")
         em.timestamp = datetime.datetime.utcnow()
 
-        warn_channel = ctx.guild.get_channel(488632843711414282)
+        warn_channel = self.bot.get_guild(215424443005009920).get_channel(488632843711414282)
         await warn_channel.send(embed=em)
+
+    @commands.command()
+    @commands.has_role('Staff')
+    async def warn(self, ctx, member: discord.Member, *, reason):
+        """Warn a user.
+        The warning will show up in #s-warns for mods to see.
+        
+        A warning is considered "recent" if it hasn't been at least 30 days since the warning.
+        """
+        await self.warn_user(member.id, ctx.author.id, reason)
         await ctx.message.add_reaction('Yes:393865045005697034')
 
     @commands.command()
