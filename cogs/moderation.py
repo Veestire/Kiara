@@ -155,6 +155,18 @@ class Moderation:
             await ch.send(f"{ctx.author.mention} requests unbanning {member.user.mention}.")
             await ctx.send('Your uban request has been received.')
 
+    async def mute_user_id(self, user_id, minutes, reason):
+        guild = self.bot.get_guild(215424443005009920)
+        member = guild.get_member(user_id)
+
+        if member is None:
+            return False
+
+        await member.add_roles(discord.utils.get(guild.roles, id=MUTED_ROLE))
+        await self.timers.create_timer('unmute', datetime.datetime.utcnow() + datetime.timedelta(minutes=minutes),
+                                       [guild.id, member.id])
+        # await self.stafflog.make_case(member, f'Mute ({minutes} minute{"s" if minutes!=1 else ""})', reason, 'Kiara')
+
     @commands.command()
     @commands.has_role('Staff')
     async def mute(self, ctx, member: discord.Member, minutes: int = 5, *, reason=None):
