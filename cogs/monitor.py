@@ -138,7 +138,7 @@ class Monitor:
                 a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
                 val = c or '-' + a
                 em.add_field(name=member.display_name, value=val[:1024], inline=False)
-            em.set_footer(text=f'Page {page+1}')
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
             return em
 
         await self.embed_paginator(ctx, callback)
@@ -160,7 +160,7 @@ class Monitor:
                 a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
                 val = c or '-' + a
                 em.add_field(name=member.display_name if member else u, value=val[:1024], inline=False)
-            em.set_footer(text=f'Page {page+1}')
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
             return em
 
         await self.embed_paginator(ctx, callback)
