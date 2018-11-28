@@ -103,9 +103,23 @@ class Monitor:
     @commands.group(invoke_without_command=True)
     @commands.has_role('Staff')
     async def deletes(self, ctx):
-        if ctx.invoked_subcommand:
-            return
-        await ctx.send('deletes')
+        qry = 'SELECT user_id, content, attachments FROM monitorlog WHERE type="delete" ORDER BY id DESC'
+        rows = await self.bot.db.fetch(qry)
+
+        if not rows:
+            return await ctx.send('No deletes found')
+
+        def callback(page):
+            em = discord.Embed(title=f'Recent deletions from anyone (anywhere)')
+            for uid, c, a in rows[page * 5:page * 5 + 5]:
+                a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
+                val = c or '-' + a
+                mem = ctx.guild.get_member(uid)
+                em.add_field(name=mem.display_name if mem else uid, value=val[:1024], inline=False)
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
+            return em
+
+        await self.embed_paginator(ctx, callback)
 
     @deletes.command(name='from')
     @commands.has_role('Staff')
