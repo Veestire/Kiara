@@ -45,6 +45,8 @@ class Automod:
                 await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=348331525479071745))
 
     async def on_message(self, msg):
+        if msg.author.id == self.bot.user.id:
+            return
         if len(list(filter(lambda m: m.author.id == msg.author.id and m.created_at > datetime.datetime.now() - datetime.timedelta(seconds=2), self.bot._connection._messages))) >= 5:
             await self.moderation.mute_user_id(msg.author.id, 5, "Auto mute")
             await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Possible spam")
