@@ -165,6 +165,71 @@ class Monitor:
 
         await self.embed_paginator(ctx, callback)
 
+    @commands.group(invoke_without_command=True, name="commands")
+    @commands.has_role('Staff')
+    async def _commands(self, ctx):
+        qry = 'SELECT user_id, content, attachments FROM monitorlog WHERE type="command" ORDER BY id DESC'
+        rows = await self.bot.db.fetch(qry)
+
+        if not rows:
+            return await ctx.send('No commands found')
+
+        def callback(page):
+            em = discord.Embed(title=f'Recent commands from anyone (anywhere)')
+            for uid, c, a in rows[page * 5:page * 5 + 5]:
+                a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
+                val = c or '-' + a
+                mem = ctx.guild.get_member(uid)
+                em.add_field(name=mem.display_name if mem else uid, value=val[:1024], inline=False)
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
+            return em
+
+        await self.embed_paginator(ctx, callback)
+
+    @_commands.command(name='from')
+    @commands.has_role('Staff')
+    async def commands_from(self, ctx, member: MemberID):
+        member = await self.bot.get_user_info(member)
+        qry = f'SELECT content, attachments FROM monitorlog WHERE type="command" AND user_id={member.id} ' \
+              f'ORDER BY id DESC'
+        rows = await self.bot.db.fetch(qry)
+
+        if not rows:
+            return await ctx.send('No commands found')
+
+        def callback(page):
+            em = discord.Embed(title=f'Recent commands from {member}')
+            for c, a in rows[page * 5:page * 5 + 5]:
+                a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
+                val = c or '-' + a
+                em.add_field(name=member.display_name, value=val[:1024], inline=False)
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
+            return em
+
+        await self.embed_paginator(ctx, callback)
+
+    @_commands.command(name='in')
+    @commands.has_role('Staff')
+    async def commands_in(self, ctx, channel: discord.TextChannel):
+        qry = f'SELECT user_id, content, attachments FROM monitorlog WHERE type="command" AND channel={channel.id} ' \
+              f'ORDER BY id DESC'
+        rows = await self.bot.db.fetch(qry)
+
+        if not rows:
+            return await ctx.send('No commands found')
+
+        def callback(page):
+            em = discord.Embed(title=f'Recent commands in {channel}')
+            for u, c, a in rows[page * 5:page * 5 + 5]:
+                member = ctx.bot.get_user(u)
+                a = '\n' + ' '.join([f'[image {i+1}]({link})' for i, link in enumerate(a.split('\n'))]) if a else ''
+                val = c or '-' + a
+                em.add_field(name=member.display_name if member else u, value=val[:1024], inline=False)
+            em.set_footer(text=f'Page {page+1}/{len(rows)//5+1}')
+            return em
+
+        await self.embed_paginator(ctx, callback)
+
     async def embed_paginator(self, ctx, callback, index=0):
         buttons = ['◀', '▶', '🔄', '⏹']
 
