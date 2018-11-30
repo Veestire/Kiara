@@ -5,6 +5,11 @@ import discord
 import itertools
 from discord.ext import commands
 
+import logging
+
+log = logging.getLogger(__name__)
+
+
 class Christmas:
     """Merry christmas"""
 
@@ -24,7 +29,7 @@ class Christmas:
                     await self.drop_present()
                 await asyncio.sleep(60)
         except Exception as e:
-            print(e)
+            log.error(e)
 
     async def drop_present(self, channel=None):
         ch = self.bot.get_channel(channel or 215424443005009920)
@@ -41,7 +46,7 @@ class Christmas:
         await ch.send(embed=emb)
 
         rand = random.random()
-        print(f"{msg.author} claimed present ({rand})")
+        log.info(f"{msg.author} claimed present ({rand})")
         if rand < .75:  # Daily
             async with self.profiles.get_lock(msg.author.id):
                 profile = await self.profiles.get_profile(msg.author.id, ('coins',))
