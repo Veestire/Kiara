@@ -1,6 +1,5 @@
 import asyncio
 import traceback
-import itertools
 
 import discord
 from discord.ext import commands
@@ -134,8 +133,7 @@ class Selfmanage:
             return False
 
     async def free_color(self, user):
-        owned = itertools.chain(*await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}'))
-        #owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}')]
+        owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}')]
         c = await self.bot.wait_for('message', check=lambda m:m.author == user and m.guild is None,
         timeout=120)
         for name, color_code, price in base_colors:
