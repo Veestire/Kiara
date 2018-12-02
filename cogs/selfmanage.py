@@ -1,9 +1,11 @@
 import asyncio
 import traceback
+import itertools
 
 import discord
 from discord.ext import commands
 
+from cogs.economy import base_colors
 
 def get_color_role(member):
     for role in member.roles:
@@ -28,12 +30,13 @@ class Selfmanage:
         ('Are you happy to receive messages from other users in the server?', 353019520983629824),
         ('Are you interested in being informed about all future server-wide events? (Movie nights, gaming events, and other fun activities)', 347689132908085248),
         ('Are you interested in seeing NSFW content?', 371251751564869632),
-        ('Are you interested in roleplay channels?', 389376686745059329),
+        ('Are you interested in roleplay channels?', 389376686745059329)
     ]
 
     def __init__(self, bot):
         self.bot = bot
         self.active_intros = []
+        self.profiles = bot.get_cog("Profiles")
 
     async def on_member_join(self, member):
         if member.guild.id == GUILD_ID:
@@ -43,6 +46,7 @@ class Selfmanage:
                     return
             except asyncio.TimeoutError:
                 pass
+            await self.questionare(member.guild, member, ctx)
             await self.questionare(member.guild, member)
 
     @commands.command()
@@ -81,6 +85,19 @@ class Selfmanage:
             else:
                 if await self.ask_question(member, "Would you like to display you're single?"):
                     roles_to_add.append(discord.utils.get(guild.roles, id=373135762230607882))
+
+            if await self.bot.redis.exists(f"claimedcolor:{member.id}") == 0:
+            if not await self.bot.redis.exists(f"claimedcolor:{member.id}"):
+                await member.send("As thanks for completing the intro, I'm going to give you a free role color!\n"
+                            "These colors are the following:\n"
+                            f"{[i[0] for i in base_colors]}\n"
+                            f"{', '.join([i[0] for i in base_colors])}\n"
+                            "Please tell me which one you'd like!\n"
+                            "Or... you can type `none` instead and I'll add 30 gold to your server balance!")
+                if await self.free_color(member) != False:
+                    await member.send("I've added this role to your inventory~ You can equip it by going to #terminal and typing `!shop`\n"
+                    "You can then `!buy` the color you chose for free! It won't cost you a thing~")
+
         except asyncio.TimeoutError:
             try:
                 await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
@@ -117,6 +134,27 @@ class Selfmanage:
             return True
         else:
             return False
+
+    async def free_color(self, user):
+        owned = itertools.chain(*await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}'))
+        #owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}')]
+        c = await self.bot.wait_for('message', check=lambda m:m.author == user and m.guild is None,
+        timeout=120)
+        for name, color_code, price in base_colors:
+            if (c.content.lower() == name.lower()) and color_code not in owned:
+                await self.bot.db.execute(f"INSERT INTO colors (user_id, color) VALUES ({user.id}, {color_code})")
+                await self.bot.redis.set(f"claimedcolor:{user.id}", f"{name}")
+                break
+
+        else:
+            async with self.profiles.get_lock(user.id):
+                profile = await self.profiles.get_profile(user.id, ('coins',))
+                profile.coins += 30
+                await profile.save(self.bot.db)
+                await self.bot.redis.set(f"claimedcolor:{user.id}", "gold")
+                await user.send("I've added 30 gold to your balance. Use `!shop` to go buy something~")
+            return False
+
 
     @commands.command()
     async def request(self, ctx, *, role):
