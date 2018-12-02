@@ -46,7 +46,6 @@ class Selfmanage:
                     return
             except asyncio.TimeoutError:
                 pass
-            await self.questionare(member.guild, member, ctx)
             await self.questionare(member.guild, member)
 
     @commands.command()
@@ -86,7 +85,6 @@ class Selfmanage:
                 if await self.ask_question(member, "Would you like to display you're single?"):
                     roles_to_add.append(discord.utils.get(guild.roles, id=373135762230607882))
 
-            if await self.bot.redis.exists(f"claimedcolor:{member.id}") == 0:
             if not await self.bot.redis.exists(f"claimedcolor:{member.id}"):
                 await member.send("As thanks for completing the intro, I'm going to give you a free role color!\n"
                             "These colors are the following:\n"
