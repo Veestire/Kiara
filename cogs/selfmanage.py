@@ -152,18 +152,5 @@ class Selfmanage:
             return False
 
 
-    @commands.command()
-    async def request(self, ctx, *, role):
-        roles = {
-            'roleplay': 389376686745059329
-        }
-        if role.lower() in roles:
-            guild = ctx.guild or self.bot.get_guild(GUILD_ID)
-            await guild.get_member(ctx.author.id).add_roles(discord.utils.get(guild.roles, id=roles[role.lower()]))
-            await ctx.send(f'I gave you the {role} role!')
-        else:
-            await ctx.send('Please request a valid role')
-
-
 def setup(bot):
     bot.add_cog(Selfmanage(bot))
