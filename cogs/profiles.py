@@ -5,6 +5,8 @@ from .utils import time
 from discord.ext import commands
 import discord
 
+from async_generator import asynccontextmanager
+
 EXCLUDED_CHANNELS = []
 
 
@@ -75,6 +77,13 @@ class Profiles:
         self.bot = bot
         self.cooldowns = {}
         self._locks = dict()
+
+    @asynccontextmanager
+    async def transaction(self, user_id):
+        async with self.get_lock(user_id):
+            profile = await self.get_profile(user_id)
+            yield profile
+            await profile.save(self.bot.db)
 
     def get_lock(self, name):
         lock = self._locks.get(name)
