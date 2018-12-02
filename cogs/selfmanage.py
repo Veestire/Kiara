@@ -86,11 +86,10 @@ class Selfmanage:
 
             if not await self.bot.redis.exists(f"claimedcolor:{member.id}"):
                 await member.send("As thanks for completing the intro, I'm going to give you a free role color!\n"
-                            "These colors are the following:\n"
-                            f"{[i[0] for i in base_colors]}\n"
-                            f"{', '.join([i[0] for i in base_colors])}\n"
-                            "Please tell me which one you'd like!\n"
-                            "Or... you can type `none` instead and I'll add 30 gold to your server balance!")
+                                  "These colors are the following:\n"
+                                  f"{', '.join([i[0] for i in base_colors])}\n"
+                                  "Please tell me which one you'd like!\n"
+                                  "Or... you can type `none` instead and I'll add 30 gold to your server balance!")
                 if await self.free_color(member) != False:
                     await member.send("I've added this role to your inventory~ You can equip it by going to #terminal and typing `!shop`\n"
                     "You can then `!buy` the color you chose for free! It won't cost you a thing~")
