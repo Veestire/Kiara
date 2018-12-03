@@ -1,8 +1,9 @@
 import asyncio
+import datetime
 import random
+import sys
 
 import discord
-import itertools
 from discord.ext import commands
 
 import logging
@@ -34,52 +35,81 @@ class Christmas:
     async def drop_present(self, channel=None):
         ch = self.bot.get_channel(channel or 215424443005009920)
 
-        emb = discord.Embed(color=discord.Color(0xfdd888))
-        emb.add_field(name='<:pr:514142498415706123> A present magically appeared on the floor!',
-                      value="Type `claim` to claim it!")
+        emb = discord.Embed(color=discord.Color(0x09c500))
+        emb.add_field(name='<:pr:514142499397173248> A big present has fallen from a sleigh high above.',
+                      value="Claim your share before Santa comes down to take it back!\nType `claim`!")
         await ch.send(embed=emb)
 
-        msg = await self.bot.wait_for('message', check=lambda m: m.author != self.bot.user and 'claim' in m.content.lower())
+        end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(5, 20))
 
-        emb = discord.Embed(color=discord.Color(0xfdd888),
-                            title=f'<:pr:514142499397173248> {msg.author.display_name} claimed the present!')
+        claimed = []
+
+        messages = []
+
+        for i in range(10):
+            try:
+                msg = await self.bot.wait_for('message', check=lambda m: m.author != self.bot.user and
+                                                                         'claim' in m.content.lower() and
+                                                                         m.channel.id == ch.id,
+                                              timeout=(end_time - datetime.datetime.now()).total_seconds())
+                messages += [msg]
+                if msg.author.id in claimed:
+                    continue
+                claimed += [msg.author.id]
+                await msg.add_reaction('👍')
+            except asyncio.TimeoutError:
+                break
+
+        await ch.delete_messages(messages)
+
+        share = ' and '.join(', '.join([f'<@{uid}>' for uid in claimed]).rsplit(', ', 1))
+
+        emb = discord.Embed(color=discord.Color(0x09c500))
+        emb.add_field(name=f'<:pr:514142498415706123> The present has been reclaimed.', value=f'{share} took a share for themselves.')
         await ch.send(embed=emb)
 
-        rand = random.random()
-        log.info(f"{msg.author} claimed present ({rand})")
-        if rand < .75:  # Daily
-            async with self.profiles.get_lock(msg.author.id):
-                profile = await self.profiles.get_profile(msg.author.id, ('coins',))
-                amount = int(random.randint(1, 5) * (1 + .2 * (profile.level // 5)))
+        for user_id in claimed:
+            try:
+                user = self.bot.get_user(user_id)
+                if not user:
+                    continue
+                rand = random.random()
+                if rand < .75:  # Daily
+                    async with self.profiles.get_lock(user_id):
+                        profile = await self.profiles.get_profile(user_id, ('coins',))
+                        amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)))
 
-                if rand < .25:  # Double daily
-                    amount *= 2
-                profile.coins += amount
-                await profile.save(self.bot.db)
-            await msg.author.send(f"Your present contained {amount} gold!")
-        elif rand < .85:  # 50-100 gold
-            async with self.profiles.get_lock(msg.author.id):
-                profile = await self.profiles.get_profile(msg.author.id, ('coins',))
-                amount = random.randint(50, 100)
-                profile.coins += amount
-                await profile.save(self.bot.db)
-            await msg.author.send(f"Your present contained {amount} gold!")
-        else:  # Random christmas color role
-            role_id, name = random.choice([(515821706535895050, 'Festive Fir'), (515822501037867009, 'Snowglobe'),
-                                          (515071275408949280, 'Christmas Spirit')])
-            owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={msg.author.id}')]
+                        if rand < .25:  # Double daily
+                            amount *= 2
+                        profile.coins += amount
+                        await profile.save(self.bot.db)
+                    await msg.author.send(f"Your share contained {amount} gold!")
+                elif rand < .85:  # 50-100 gold
+                    async with self.profiles.get_lock(user_id):
+                        profile = await self.profiles.get_profile(user_id, ('coins',))
+                        amount = random.randint(25, 50)
+                        profile.coins += amount
+                        await profile.save(self.bot.db)
+                    await msg.author.send(f"Your share contained {amount} gold!")
+                else:  # Random christmas color role
+                    role_id, name = random.choice([(515821706535895050, 'Festive Fir'), (515822501037867009, 'Snowglobe'),
+                                                  (515071275408949280, 'Christmas Spirit')])
+                    owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user_id}')]
 
-            if role_id in owned:
-                async with self.profiles.get_lock(msg.author.id):
-                    profile = await self.profiles.get_profile(msg.author.id, ('coins',))
-                    amount = int(random.randint(1, 5) * (1 + .2 * (profile.level // 5)))
-                    profile.coins += amount
-                    await profile.save(self.bot.db)
-                await msg.author.send(f"Your present contained {amount} gold!")
-            else:
-                await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({msg.author.id}, {role_id})')
-                await msg.author.send(f"Your present contained the '{name}' role!\n"
-                                      "It has been added to your color inventory.")
+                    if role_id in owned:
+                        async with self.profiles.get_lock(user_id):
+                            profile = await self.profiles.get_profile(user_id, ('coins',))
+                            amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)))
+                            profile.coins += amount
+                            await profile.save(self.bot.db)
+                        await msg.author.send(f"Your share contained {amount} gold!")
+                    else:
+                        await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({user_id}, {role_id})')
+                        await msg.author.send(f"Your share contained the '{name}' role!\n"
+                                              "It has been added to your color inventory.")
+            except Exception as e:
+                print(f'Fucksywucksy', file=sys.stderr)
+                print(e, file=sys.stderr)
 
     @commands.command(hidden=True)
     @commands.has_role('Staff')
