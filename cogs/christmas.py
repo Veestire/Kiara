@@ -83,14 +83,14 @@ class Christmas:
                             amount *= 2
                         profile.coins += amount
                         await profile.save(self.bot.db)
-                    await msg.author.send(f"Your share contained {amount} gold!")
+                    await user.send(f"Your share contained {amount} gold!")
                 elif rand < .85:  # 50-100 gold
                     async with self.profiles.get_lock(user_id):
                         profile = await self.profiles.get_profile(user_id, ('coins',))
                         amount = random.randint(25, 50)
                         profile.coins += amount
                         await profile.save(self.bot.db)
-                    await msg.author.send(f"Your share contained {amount} gold!")
+                    await user.send(f"Your share contained {amount} gold!")
                 else:  # Random christmas color role
                     role_id, name = random.choice([(515821706535895050, 'Festive Fir'), (515822501037867009, 'Snowglobe'),
                                                   (515071275408949280, 'Christmas Spirit')])
@@ -102,11 +102,11 @@ class Christmas:
                             amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)))
                             profile.coins += amount
                             await profile.save(self.bot.db)
-                        await msg.author.send(f"Your share contained {amount} gold!")
+                        await user.send(f"Your share contained {amount} gold!")
                     else:
                         await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({user_id}, {role_id})')
-                        await msg.author.send(f"Your share contained the '{name}' role!\n"
-                                              "It has been added to your color inventory.")
+                        await user.send(f"Your share contained the '{name}' role!\n"
+                                        "It has been added to your color inventory.")
             except Exception as e:
                 print(f'Fucksywucksy', file=sys.stderr)
                 print(e, file=sys.stderr)
