@@ -40,7 +40,7 @@ class Christmas:
                       value="Claim your share before Santa comes down to take it back!\nType `claim`!")
         await ch.send(embed=emb)
 
-        end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(5, 20))
+        end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(8, 20))
 
         claimed = []
 
@@ -62,11 +62,16 @@ class Christmas:
 
         await ch.delete_messages(messages)
 
-        share = ' and '.join(', '.join([f'<@{uid}>' for uid in claimed]).rsplit(', ', 1))
+        if claimed:
+            share = ' and '.join(', '.join([f'<@{uid}>' for uid in claimed]).rsplit(', ', 1))
 
-        emb = discord.Embed(color=discord.Color(0x09c500))
-        emb.add_field(name=f'<:pr:514142498415706123> The present has been reclaimed.', value=f'{share} took a share for themselves.')
-        await ch.send(embed=emb)
+            emb = discord.Embed(color=discord.Color(0x09c500))
+            emb.add_field(name=f'<:pr:514142498415706123> The present has been reclaimed.', value=f'{share} took a share for themselves.')
+            await ch.send(embed=emb)
+        else:
+            emb = discord.Embed(color=discord.Color(0x09c500), title="Santa reclaimed the present before anyone could take a look inside.")
+            await ch.send(embed=emb)
+            return
 
         for user_id in claimed:
             try:
