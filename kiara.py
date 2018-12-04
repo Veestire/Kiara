@@ -11,6 +11,9 @@ from cogs.utils import context, db
 from cogs.utils.config import Config
 from cogs.utils.helpformatter import KiaraFormatter
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 desc = 'A personal bot for Waifu Worshipping'
 
