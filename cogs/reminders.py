@@ -17,6 +17,8 @@ class Reminders:
         self.timers = bot.get_cog('Timers')
 
     async def on_message(self, msg):
+        if msg.channel.id != 269910005837332480:
+            return
         if msg.content.lower().startswith('remind '):
             reminder = msg.content[7:]
             if reminder.lower().startswith('me '):
