@@ -93,7 +93,6 @@ class Profiles:
         return lock
 
     async def get_profile(self, uid, keys=None):
-        s = ', '.join(keys)
         profile = await self.bot.db.fetchdict(f'SELECT * FROM profiles WHERE user_id={uid}')
         if not profile:
             await self.bot.db.execute(f'INSERT INTO profiles (user_id) VALUES ("{uid}")')
