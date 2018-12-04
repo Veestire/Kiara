@@ -1,7 +1,69 @@
 import random
+
 import discord
 from discord.ext import commands
 
+from cogs.utils.cooldowns import basic_cooldown
+
+class Fruit:
+    __slots__ = ('name', 'weight', 'payout')
+
+    def __init__(self, name, weight, payout):
+        self.name = name
+        self.weight = weight
+        self.payout = payout
+
+class Slotmachine:
+    lines = [
+        (1, 1, 1, 1, 1),  # mid
+        (0, 0, 0, 0, 0),  # top
+        (2, 2, 2, 2, 2),  # bot
+        (0, 1, 2, 1, 0),  # zigzoggle
+        (2, 1, 0, 1, 2),  # zigzoggle inv
+        (1, 0, 0, 0, 1),  # bridge top
+        (1, 2, 2, 2, 1),  # bridge inv
+        (0, 0, 1, 2, 2),  #
+        (2, 2, 1, 0, 0),  #
+        (1, 0, 1, 2, 1),  #
+        (1, 2, 1, 0, 1),  #
+    ]
+    def __init__(self):
+        self.reels = [[], [], [], [], []]
+        self.fruits = [
+            Fruit('🍐', (13, 11, 13, 12, 12), (0, 2, 4, 8, 16)),
+            Fruit('🍌', (5, 6, 5, 6, 5), (0, 10, 50, 100, 200)),
+            Fruit('🍰', (4, 5, 4, 4, 5), (0, 25, 250, 2500, 25000)),
+            Fruit('🍔', (3, 3, 3, 3, 3), (0, 100, 1000, 10000, 100000)),
+        ]
+        for i, fruit in enumerate(self.fruits):
+            for r in range(5):
+                self.reels[r] += [i]*fruit.weight[r]
+        self.outcome = self.shuffle()
+
+    def shuffle(self):
+        for reel in self.reels:
+            random.shuffle(reel)
+        self.outcome = [reel[:3] for reel in self.reels]
+        return self.outcome
+
+    def get_representation(self):
+        return '\n'.join([''.join([self.fruits[self.outcome[slot][row]].name for slot in range(5)]) for row in range(3)])
+
+    def get_wins(self, lines=1):
+        winnings = []
+        total = 0
+        for line in self.lines[:lines]:
+            first = self.outcome[0][line[0]]
+            for i, col in enumerate(line):
+                if i == 4:
+                    continue
+                if self.outcome[i+1][col] != first:
+                    break
+            print("Total images =", i+1)
+            if i > 0:
+                total += self.fruits[first].payout[i]
+                winnings += [f"You got {self.fruits[first].name} x{i+1} which is {self.fruits[first].payout[i]}"]
+        return total, winnings
 
 class Casino:
     """Temporary casino so you can start gambling"""
@@ -118,6 +180,29 @@ class Casino:
 
             await profile.save(self.bot.db)
 
+    @commands.command(aliases=['slots'])
+    async def slotmachine(self, ctx, bet_per_line: int = 1, lines: int = 1):
+        """Spin the slotmachine"""
+        if discord.utils.get(ctx.author.roles, name="Staff") is None:
+            lines = 1
+        if bet_per_line <= 0:
+            return await ctx.send("Please bet more than 0")
+        if lines <= 0:
+            return await ctx.send("Please bet on more than one line")
+
+        async with self.profiles.transaction(ctx.author.id) as profile:
+            if profile.coins < bet_per_line*lines:
+                return await ctx.send("You don't have enough gold")
+
+            profile.coins -= bet_per_line*lines
+
+            slotmachine = Slotmachine()
+            total, info = slotmachine.get_wins(lines)
+            if total > 0:
+                profile.coins += total*bet_per_line
+
+        await ctx.send('\n'.join(info)+f"\nTotal gain: {bet_per_line*total-bet_per_line*lines}",
+                       embed=discord.Embed(description=slotmachine.get_representation()))
 
 
 def setup(bot):
