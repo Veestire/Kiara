@@ -7,7 +7,7 @@ import discord
 
 from async_generator import asynccontextmanager
 
-EXCLUDED_CHANNELS = []
+EXCLUDED_CHANNELS = [269910005837332480, 451729018199212032]
 
 
 def exp_needed(level):
