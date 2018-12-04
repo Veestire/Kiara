@@ -20,7 +20,7 @@ class Fun:
         await ctx.send("Start counting!")
 
         while True:
-            msg = await self.bot.wait_for('message', check=lambda m: m.channel.id == ctx.channel.id, timeout=60)
+            msg = await self.bot.wait_for('message', check=lambda m: m.channel.id == ctx.channel.id and not m.author.bot, timeout=60)
             if msg.author.id == last:
                 break
             try:
