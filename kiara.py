@@ -13,7 +13,7 @@ from cogs.utils.helpformatter import KiaraFormatter
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 desc = 'A personal bot for Waifu Worshipping'
 
