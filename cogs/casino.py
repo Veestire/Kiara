@@ -201,8 +201,8 @@ class Casino:
             if total > 0:
                 profile.coins += total*bet_per_line
 
-        await ctx.send('\n'.join(info)+f"\nTotal gain: {bet_per_line*total-bet_per_line*lines}",
-                       embed=discord.Embed(description=slotmachine.get_representation()))
+        await ctx.send(slotmachine.get_representation(),
+                       embed=discord.Embed(description='\n'.join(info)+f"\nTotal gain: {bet_per_line*total-bet_per_line*lines}"))
 
 
 def setup(bot):
