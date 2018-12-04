@@ -182,7 +182,7 @@ class Casino:
 
             await profile.save(self.bot.db)
 
-    @commands.command(aliases=['slots'])
+    @commands.command(enabled=False, aliases=['slots'])
     async def slotmachine(self, ctx, bet_per_line: int = 1, lines: int = 1):
         """Spin the slotmachine"""
         if discord.utils.get(ctx.author.roles, name="Staff") is None:
