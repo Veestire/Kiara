@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 
@@ -20,12 +22,16 @@ class Fun:
         await ctx.send("Start counting!")
 
         while True:
-            msg = await self.bot.wait_for('message', check=lambda m: m.channel.id == ctx.channel.id and not m.author.bot, timeout=60)
-            if msg.author.id == last:
+            try:
+                msg = await self.bot.wait_for('message', check=lambda m: m.channel.id == ctx.channel.id and not m.author.bot, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send(embed=discord.Embed(description=f"Sorry you took too long."))
                 break
+            # if msg.author.id == last:
+            #     break
             try:
                 if int(msg.content) == count+1:
-                    # last = msg.author.id
+                    last = msg.author.id
                     if msg.author.id not in participants:
                         participants += [msg.author.id]
                     count += 1
