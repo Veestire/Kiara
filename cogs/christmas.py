@@ -47,7 +47,7 @@ class Christmas:
 
         for i in range(20):
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id != self.bot.user and
+                reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id != self.bot.user.id and
                                                                                             r.message.id == msg.id,
                                                          timeout=(end_time - datetime.datetime.now()).total_seconds())
                 if user.id in claimed:
