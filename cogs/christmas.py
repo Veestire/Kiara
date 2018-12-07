@@ -37,30 +37,24 @@ class Christmas:
 
         emb = discord.Embed(color=discord.Color(0x09c500))
         emb.add_field(name='<:pr:514142499397173248> A big present has fallen from a sleigh high above.',
-                      value="Claim your share before Santa comes down to take it back!\nType `claim`!")
-        await ch.send(embed=emb)
+                      value="Claim your share by reacting before Santa comes down to take it back!")
+        msg = await ch.send(embed=emb)
+        await msg.add_reaction('pr:514142498415706123')
 
         end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(8, 20))
 
         claimed = []
 
-        messages = []
-
-        for i in range(10):
+        for i in range(20):
             try:
-                msg = await self.bot.wait_for('message', check=lambda m: m.author != self.bot.user and
-                                                                         'claim' in m.content.lower() and
-                                                                         m.channel.id == ch.id,
-                                              timeout=(end_time - datetime.datetime.now()).total_seconds())
-                messages += [msg]
-                if msg.author.id in claimed:
+                reaction, user = await self.bot.wait_for('reaction_add', check=lambda r, u: u.id != self.bot.user and
+                                                                                            r.message.id == msg.id,
+                                                         timeout=(end_time - datetime.datetime.now()).total_seconds())
+                if user.id in claimed:
                     continue
-                claimed += [msg.author.id]
-                await msg.add_reaction('👍')
+                claimed += [user.id]
             except asyncio.TimeoutError:
                 break
-
-        await ch.delete_messages(messages)
 
         if claimed:
             share = ' and '.join(', '.join([f'<@{uid}>' for uid in claimed]).rsplit(', ', 1))
