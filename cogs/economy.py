@@ -102,7 +102,7 @@ class Economy:
         for name, data, cost in extra_colors:
             self.shops[1].add(Item(name, ItemType.ROLE, cost=cost, data=data))
 
-    @basic_cooldown(86400)
+    @basic_cooldown(79200)
     @commands.guild_only()
     @commands.command(aliases=['daily'])
     async def dailies(self, ctx, *, receiver: discord.Member=None):
