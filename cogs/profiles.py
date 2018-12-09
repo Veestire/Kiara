@@ -283,14 +283,14 @@ class Profiles:
     async def exprate(self, ctx, rate: float = None):
         if rate:
             self.exp_rate = rate
-        await ctx.send(f"Exp rate is now x{self.exp_rateg}")
+        await ctx.send(f"Exp rate is now x{self.exp_rate}")
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def goldrate(self, ctx, rate: float = None):
         if rate:
             self.gold_rate = rate
-        await ctx.send(f"Exp rate is now x{self.gold_rate}")
+        await ctx.send(f"Gold rate is now x{self.gold_rate}")
 
 def setup(bot):
     bot.add_cog(Profiles(bot))
