@@ -78,6 +78,9 @@ class Profiles:
         self.cooldowns = {}
         self._locks = dict()
 
+        self.exp_rate = 1
+        self.gold_rate = 1
+
     @asynccontextmanager
     async def transaction(self, user_id):
         async with self.get_lock(user_id):
@@ -113,11 +116,11 @@ class Profiles:
             if d < datetime.timedelta(seconds=5):
                 return
 
-            profile.experience += 10
+            profile.experience += 10*self.exp_rate
 
             # Bonus for images
             if msg.attachments:
-                profile.experience += 30
+                profile.experience += 30*self.exp_rate
             else:
                 self.cooldowns[profile.user_id] = msg.created_at
 
@@ -127,7 +130,7 @@ class Profiles:
             if profile.experience >= needed:
                 profile.level += 1
                 profile.experience -= needed
-                profile.coins += levelup_gold(profile.level)
+                profile.coins += levelup_gold(profile.level)*self.gold_rate
 
                 # Temporary faithful role, the whole role idea will change in the future.
                 if profile.level == 3:
@@ -275,6 +278,19 @@ class Profiles:
                 return role
         return None
 
+    @commands.command(hidden=True)
+    @commands.has_permissions(administrator=True)
+    async def exprate(self, ctx, rate: float = None):
+        if rate:
+            self.exp_rate = rate
+        await ctx.send(f"Exp rate is now x{self.exp_rateg}")
+
+    @commands.command(hidden=True)
+    @commands.has_permissions(administrator=True)
+    async def goldrate(self, ctx, rate: float = None):
+        if rate:
+            self.gold_rate = rate
+        await ctx.send(f"Exp rate is now x{self.gold_rate}")
 
 def setup(bot):
     bot.add_cog(Profiles(bot))

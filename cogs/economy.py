@@ -113,7 +113,7 @@ class Economy:
 
         async with self.profiles.get_lock(ctx.author.id):
             profile = await self.profiles.get_profile(ctx.author.id, ('coins', 'level'))
-            amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)))
+            amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)) * self.profiles.gold_rate)
             if receiver:
                 async with self.profiles.get_lock(receiver.id):
                     profile2 = await self.profiles.get_profile(receiver.id, ('coins', 'level'))
