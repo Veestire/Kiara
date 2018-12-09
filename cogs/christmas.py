@@ -76,7 +76,7 @@ class Christmas:
                 if rand < .75:  # Daily
                     async with self.profiles.get_lock(user_id):
                         profile = await self.profiles.get_profile(user_id, ('coins',))
-                        amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)))
+                        amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.profiles.gold_rate)
 
                         if rand < .25:  # Double daily
                             amount *= 2
@@ -98,7 +98,7 @@ class Christmas:
                     if role_id in owned:
                         async with self.profiles.get_lock(user_id):
                             profile = await self.profiles.get_profile(user_id, ('coins',))
-                            amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)))
+                            amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.profiles.gold_rate)
                             profile.coins += amount
                             await profile.save(self.bot.db)
                         await user.send(f"Your share contained {amount} gold!")
