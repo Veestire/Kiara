@@ -3,35 +3,35 @@ import discord
 
 
 STAR_CHANNEL = 415464201809690624
-STAR_THRESHOLD = 8
+STAR_THRESHOLD = 4
 
-IGNORED = [271695900718399488]
+IGNORED = [271695900718399488, 415464201809690624]
 
 class Starboard:
     """Starboard pinning quotes stuff"""
 
-    async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
-        if channel_id == STAR_CHANNEL:
+    async def on_raw_reaction_add(self, payload):
+        if payload.channel_id in IGNORED:
             return
-        if channel_id in IGNORED:
+        if str(payload.emoji) not in ['\N{WHITE MEDIUM STAR}', '✨']:
             return
-        if str(emoji) != '\N{WHITE MEDIUM STAR}':
-            return
-        channel = self.bot.get_channel(channel_id)
-        msg = await channel.get_message(message_id)
-        if await self.count_stars(msg) < STAR_THRESHOLD:
-            return
+        channel = self.bot.get_channel(payload.channel_id)
+        msg = await channel.get_message(payload.message_id)
 
-        r = await self.bot.db.fetchone(f'SELECT * FROM `starboard` WHERE message_id={message_id}')
-        if r:
-            pass
+        if str(payload.emoji) == '✨':
+            if not discord.utils.get(channel.guild.get_member(payload.user_id).roles, name="Staff"):
+                return
         else:
+            if await self.count_stars(msg) < STAR_THRESHOLD:
+                return
+
+        if not await self.bot.db.fetchone(f'SELECT * FROM `starboard` WHERE message_id={payload.message_id}'):
             emb = self.make_embed(msg)
             post = await self.bot.get_channel(STAR_CHANNEL).send(embed=emb)
             await self.bot.db.execute(
-                f'INSERT INTO `starboard` (message_id, bot_message_id) VALUES ({message_id}, {post.id})')
+                f'INSERT INTO `starboard` (message_id, bot_message_id) VALUES ({payload.message_id}, {post.id})')
 
-    async def on_raw_reaction_remove(self, emoji, message_id, channel_id, user_id):
+    async def on_raw_reaction_remove(self, payload):
         pass
 
     def make_embed(self, msg):
