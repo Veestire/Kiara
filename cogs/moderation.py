@@ -422,13 +422,15 @@ class Moderation:
 
         await ctx.send(embed=em)
 
-    @commands.command(aliases=['event', 'ping'])
+    @commands.command(aliases=['eventping'])
     @commands.has_role('Staff')
     async def toggleeventping(self, ctx):
-        event = discord.utils.get(ctx.guild.roles, id = 347689132908085248)
-        await event.edit(mentionable = True, reason="Making Event Pingable")
-        await asyncio.sleep(30)
-        await event.edit(mentionable= False, reason="Making Event Unpingable")
+        event_role = discord.utils.get(ctx.guild.roles, id=347689132908085248)
+        await event_role.edit(mentionable=True, reason="Making Event Pingable")
+        await ctx.send("Event ping mentionable till pinged")
+        await self.bot.wait_for('message', check=lambda m: event_role in m.role_mentions)
+        await event_role.edit(mentionable=False, reason="Making Event Unpingable")
+        await ctx.send("Event ping no longer mentionable")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
