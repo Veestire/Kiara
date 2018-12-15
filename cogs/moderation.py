@@ -231,7 +231,7 @@ class Moderation:
             member = ctx.guild.get_member(member) or await self.bot.get_user_info(member)
         except discord.NotFound:
             return await ctx.send("Unknown user")
-        
+
         if member.id == 73389450113069056:
             member.joined_at = ctx.guild.created_at
 
@@ -400,7 +400,7 @@ class Moderation:
     async def warn(self, ctx, member: discord.Member, *, reason):
         """Warn a user.
         The warning will show up in #s-warns for mods to see.
-        
+
         A warning is considered "recent" if it hasn't been at least 30 days since the warning.
         """
         await self.warn_user(member.id, ctx.author.id, reason)
@@ -421,6 +421,14 @@ class Moderation:
         em.timestamp = datetime.datetime.utcnow()
 
         await ctx.send(embed=em)
+
+    @commands.command(aliases=['event', 'ping'])
+    @commands.has_role('Staff')
+    async def toggleeventping(self, ctx):
+        event = discord.utils.get(ctx.guild.roles, id = 347689132908085248)
+        await event.edit(mentionable = True, reason="Making Event Pingable")
+        await asyncio.sleep(30)
+        await event.edit(mentionable= False, reason="Making Event Unpingable")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
