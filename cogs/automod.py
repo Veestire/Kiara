@@ -32,9 +32,6 @@ class Automod:
             print(e)
 
     async def invite_check(self, msg):
-        if msg.guild is None:
-            return
-
         # Check if message content contains an invite url
         invite = self.inviteregex.search(msg.content)
         if invite:
@@ -42,12 +39,23 @@ class Automod:
             if discord.utils.get(msg.author.roles, name="Staff") is None:
                 await msg.delete()
                 await msg.channel.send(f"{msg.author.mention} you sent an invite link, I deleted it for you.")
-                await msg.author.add_roles(discord.utils.get(msg.guild.roles, id=348331525479071745))
+                return True
 
     async def on_message(self, msg):
         if not msg.guild:
             return
 
+        # Invite filter
+        if await self.invite_check(msg):
+            await self.moderation.mute_user_id(msg.author.id, 10, "Auto mute")
+            await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Sent an invite link")
+
+        # Mention spam filter
+        if len(msg.mentions) >= 10:
+            await self.moderation.mute_user_id(msg.author.id, 10, "Auto mute")
+            await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Possible spam (Mentions)")
+
+        # Spam filter
         exempt_categories = [360699183851896833, 360707378275942400, 467658509224378388]  # Media, NSFW, Waifu
         if msg.channel.category_id in exempt_categories:
             return
@@ -60,7 +68,6 @@ class Automod:
             await self.moderation.mute_user_id(msg.author.id, 5, "Auto mute")
             await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Possible spam")
 
-        await self.invite_check(msg)
 
     async def on_message_edit(self, before, after):
         await self.invite_check(after)
