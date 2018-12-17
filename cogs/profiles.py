@@ -231,7 +231,7 @@ class Profiles:
         r = await ctx.bot.db.fetch(qry, ((page - 1) * 10, 10))
         w = max(len(getattr(guild.get_member(user_id), 'display_name', 'user_left')) for user_id, coins, rank in r)
         output = '```\n' + '\n'.join([
-            f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - {coins:<7} coins"
+            f"{int(rank):<3} - {getattr(guild.get_member(user_id),'display_name','user_left'):<{w}} - {coins:>10} gold"
             for user_id, coins, rank in r]) + '```'
         await ctx.send(output)
 
