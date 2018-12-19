@@ -55,21 +55,29 @@ class Raffle:
         end = await self.bot.redis.hget(f'raffle:{message_id}', 'end', encoding='utf8')
         end = datetime.datetime.utcfromtimestamp(int(end))
 
+        num_winners = int(await self.bot.redis.hget(f'raffle:{message_id}', 'winners', encoding='utf8') or 1)
+
         if datetime.datetime.utcnow() >= end:
+            winners = []
             entries = await self.bot.redis.lrange(f'raffle_entries:{message_id}', 0, -1, encoding='utf8') or ['???']
-            for i in range(20):
-                winner = random.choice(entries)
-                if self.bot.get_user(int(winner)):
-                    break
-            await message.edit(embed=await self.generate_end_embed(message_id, winner))
+            for x in range(num_winners):
+                for i in range(20):
+                    winner = random.choice(entries)
+                    if winner in winners:
+                        continue
+                    if self.bot.get_user(int(winner)):
+                        winners += [winner]
+                        break
+
+            await message.edit(embed=await self.generate_end_embed(message_id, winners))
             await self.bot.redis.delete(f'raffle:{message_id}')
         else:
             await message.edit(embed=await self.generate_embed(message_id))
 
     @commands.has_role('Staff')
     @commands.command()
-    async def createraffle(self, ctx, cost: int, hours: int, *, reward):
-        if ctx.channel.id not in [467614160251912193,508287405061701633]:
+    async def createraffle(self, ctx, cost: int, hours: int, winners: int, *, reward):
+        if ctx.channel not in [self.raffle_channel, self.alt_raffle_channel]:
             return await ctx.send("Use this in one of the raffle channels")
         await ctx.message.delete()
         message = await ctx.send('setting up raffle..')
@@ -78,6 +86,7 @@ class Raffle:
         raffle_id = await self.bot.redis.incr('rafflecount')
         endtime = datetime.datetime.utcnow() + datetime.timedelta(hours=hours)
         await self.bot.redis.hmset(f'raffle:{message.id}', 'raffle_id', raffle_id, 'cost', cost, 'reward', reward,
+                                   'winners', winners,
                                    'end', round((endtime - datetime.datetime(1970, 1, 1)).total_seconds()))
 
         await message.edit(content=None, embed=await self.generate_embed(message.id))
@@ -103,7 +112,7 @@ class Raffle:
         embed.set_footer(text=f'⏰ Ends in {custom_format(datetime.datetime.utcfromtimestamp(float(end))-datetime.datetime.utcnow())} at')
         return embed
 
-    async def generate_end_embed(self, message_id, winner_id):
+    async def generate_end_embed(self, message_id, winners):
         # fetch raffle info
         raffle_id, reward, cost, end = await self.bot.redis.hmget(f'raffle:{message_id}', 'raffle_id', 'reward', 'cost',
                                                                   'end', encoding='utf8')
@@ -113,8 +122,8 @@ class Raffle:
         embed.add_field(name='Prize', value=str(reward or '?'))
         embed.add_field(name='Entry cost', value=str(cost or '?')+'g')
         embed.add_field(name='Entries', value=num_entries)
-        winner = await self.bot.get_user_info(int(winner_id))
-        embed.add_field(name='Winner', value=f"<@{winner_id}> {winner}", inline=False)
+        winners = [f"<@{winner}> {self.bot.get_user(int(winner))}" for winner in winners]
+        embed.add_field(name='Winners' if len(winners)>1 else "Winner", value='\n'.join(winners), inline=False)
         embed.timestamp = datetime.datetime.utcfromtimestamp(float(end))
         embed.set_footer(text=f'⏰ Ended')
         return embed
@@ -122,7 +131,7 @@ class Raffle:
     async def on_raw_reaction_add(self, payload):
         if payload.user_id == self.bot.user.id:
             return
-        if payload.channel_id not in [467614160251912193, 508287405061701633]:
+        if payload.channel_id not in [self.raffle_channel.id, self.alt_raffle_channel.id]:
             return
         if str(payload.emoji) != '💎':
             return
