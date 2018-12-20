@@ -26,7 +26,7 @@ class Automod:
         channel = self.bot.get_channel(497088811486937098)
         try:
             while not self.bot.is_closed():
-                await channel.edit(name=f"Total Users > {len(channel.guild.members)}")
+                await channel.edit(name=f"✨Users: {len(channel.guild.members)}")
                 await asyncio.sleep(3600)
         except Exception as e:
             print(e)
