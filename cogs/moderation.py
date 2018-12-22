@@ -433,5 +433,13 @@ class Moderation:
         await event_role.edit(mentionable=False, reason="Making Event Unpingable")
         await ctx.send("Event ping no longer mentionable", delete_after=2)
 
+    @commands.guild_only()
+    @commands.command()
+    @commands.has_role('Staff')
+    async def tribute(self, ctx, member: discord.Member):
+        tribute = discord.utils.get(ctx.guild.roles, id=496940869774082048)
+        await member.add_roles(tribute)
+        await ctx.send(f"User {member} now has the `tribute` role.", delete_after=5)
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
