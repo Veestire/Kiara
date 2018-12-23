@@ -55,6 +55,14 @@ class Automod:
             await self.moderation.mute_user_id(msg.author.id, 10, "Auto mute")
             await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Possible spam (Mentions)")
 
+        # Message filter in NSFW channels
+        if msg.channel.category_id == 360707378275942400 and msg.channel.id != 447050781544153089:
+            if not msg.attachments:
+                await msg.delete()
+                await msg.author.send("Please refrain from talking in the NSFW image channels, "
+                                      "you can leave any comments in <#447050781544153089>.")
+                await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Talking in NSFW image channels")
+
         # Spam filter
         exempt_categories = [360699183851896833, 360707378275942400, 467658509224378388]  # Media, NSFW, Waifu
         if msg.channel.category_id in exempt_categories:
