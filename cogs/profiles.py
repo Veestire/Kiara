@@ -121,6 +121,10 @@ class Profiles:
             # Bonus for images
             if msg.attachments:
                 profile.experience += 10*self.exp_rate
+
+                # Extra bonus for waifu channels
+                if msg.channel.id in [467658653273423872, 467658673918050305]:
+                    profile.experience += 20
             else:
                 self.cooldowns[profile.user_id] = msg.created_at
 
