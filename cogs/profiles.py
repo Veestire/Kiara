@@ -54,17 +54,22 @@ def levelup_gold(lvl):
 
 
 class Profile:
-    __slots__ = ('user_id', 'level', 'experience', 'fame', 'coins')
+    __slots__ = ('user_id', 'db', 'level', 'experience', 'fame', 'coins')
 
     def __init__(self, uid, **kwargs):
         self.user_id = uid
+        self.db = kwargs.get('db', None)
+
         self.level = kwargs.get('level', 1)
         self.experience = kwargs.get('experience', 0)
         self.coins = kwargs.get('coins', 0)
 
-    async def save(self, db):
-        s = ','.join([f'{s}={getattr(self,s,None)}' for s in self.__slots__[1:] if getattr(self, s, None) is not None])
-        await db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
+    async def save(self, db=None):
+        db = self.db or db
+        if db:
+            s = ','.join(
+                [f'{s}={getattr(self,s,None)}' for s in self.__slots__[2:] if getattr(self, s, None) is not None])
+            await db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
 
     async def has_item(self, name=None):
         pass
@@ -82,11 +87,12 @@ class Profiles:
         self.gold_rate = 1
 
     @asynccontextmanager
-    async def transaction(self, user_id):
+    async def transaction(self, user_id, save=True):
         async with self.get_lock(user_id):
             profile = await self.get_profile(user_id)
             yield profile
-            await profile.save(self.bot.db)
+            if save:
+                await profile.save(self.bot.db)
 
     def get_lock(self, name):
         lock = self._locks.get(name)
@@ -99,8 +105,8 @@ class Profiles:
         profile = await self.bot.db.fetchdict(f'SELECT * FROM profiles WHERE user_id={uid}')
         if not profile:
             await self.bot.db.execute(f'INSERT INTO profiles (user_id) VALUES ("{uid}")')
-            return Profile(uid, level=0, experience=0, coins=0)
-        return Profile(uid, **profile)
+            return Profile(uid, level=0, experience=0, coins=0, db=self.bot.db)
+        return Profile(uid, **profile, db=self.bot.db)
 
     async def on_message(self, msg):
         if not msg.guild:
