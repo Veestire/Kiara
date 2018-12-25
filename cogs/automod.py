@@ -5,6 +5,7 @@ import re
 import discord
 
 INVITE_REGEX = "(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+"
+LINK_REGEX = "(https?:\/\/[^\s<]+[^<.,:;\"')\]\s])"
 
 
 class Automod:
@@ -13,6 +14,7 @@ class Automod:
     def __init__(self, bot):
         self.bot = bot
         self.inviteregex = re.compile(INVITE_REGEX)
+        self.linkregex = re.compile(LINK_REGEX)
 
         self.moderation = bot.get_cog("Moderation")
 
@@ -58,10 +60,14 @@ class Automod:
         # Message filter in NSFW channels
         exempt_channels = [447050781544153089, 274230637538574337, 399017427897155604, 487134988031098881]  # comments, links, fiction, non-fiction
         if msg.channel.category_id == 360707378275942400 and msg.channel.id not in exempt_channels:
-            if not msg.attachments:
+            if not msg.attachments and not self.linkregex.search(msg.content):
                 await msg.delete()
-                await msg.author.send("Please refrain from talking in the NSFW image channels, "
-                                      "you can leave any comments in <#447050781544153089>.")
+                warnmsg = "Please refrain from talking in the NSFW image channels, " \
+                          "you can leave any comments in <#447050781544153089>."
+                try:
+                    await msg.author.send(warnmsg)
+                except discord.Forbidden:
+                    await msg.channel.send(warnmsg, delete_after=6)
                 await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Talking in NSFW image channels")
                 if len(await self.moderation.get_recent_warns(msg.author.id)) >= 3:
                     await self.moderation.mute_user_id(msg.author.id, 60, "Auto mute")
