@@ -225,7 +225,7 @@ class Profiles:
         await ctx.send(embed=e)
 
     @commands.command(hidden=True)
-    async def top(self, ctx, page: int = 1):
+    async def bank(self, ctx, page: int = 1):
         """Display the wealthiest members on the server"""
         guild = self.bot.get_guild(215424443005009920)
         qry = f"""
