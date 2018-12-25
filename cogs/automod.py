@@ -47,6 +47,9 @@ class Automod:
         if not msg.guild:
             return
 
+        if msg.author.id == self.bot.user.id:
+            return
+
         # Invite filter
         if await self.invite_check(msg):
             await self.moderation.mute_user_id(msg.author.id, 10, "Auto mute")
