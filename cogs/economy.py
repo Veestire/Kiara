@@ -259,7 +259,7 @@ class Economy:
             item = discord.utils.get(self.all_shop_items(), id=item_id)
             qry = "UPDATE shop_items SET active = !active WHERE id=%s"
             await self.bot.db.execute(qry, (item_id,))
-            out += [f'{item.name} is {"now" if item.active else "no longer"} for sale.']
+            out += [f'{item.name} is {"no longer" if item.active else "now"} for sale.']
         await ctx.send('\n'.join(out))
         await self.init_shop()
 
