@@ -436,10 +436,17 @@ class Moderation:
     @commands.guild_only()
     @commands.command()
     @commands.has_role('Staff')
-    async def tribute(self, ctx, member: discord.Member):
+    async def tribute(self, ctx, *, member: discord.Member):
         tribute = discord.utils.get(ctx.guild.roles, id=496940869774082048)
         await member.add_roles(tribute)
-        await ctx.send(f"User {member} now has the `tribute` role.", delete_after=5)
+        await ctx.send(f"User {member} now has the `tribute` role.")
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_role('Staff')
+    async def verify(self, ctx, *, member: discord.Member):
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=373461042208178177))
+        await ctx.send(f"User {member} has been verified")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
