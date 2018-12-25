@@ -47,7 +47,12 @@ class Automod:
         if not msg.guild:
             return
 
+        # Ignore kiara
         if msg.author.id == self.bot.user.id:
+            return
+
+        # Ignore staff for everything
+        if discord.utils.get(msg.author.roles, id=293008190843387911):
             return
 
         # Invite filter
@@ -80,7 +85,7 @@ class Automod:
         if msg.channel.category_id in exempt_categories:
             return
 
-        exempt_roles = [326644349607739393, 457213160504426496, 293008190843387911]  # Bot, Faithful, Staff
+        exempt_roles = [326644349607739393, 457213160504426496]  # Bot, Faithful
         if discord.utils.find(lambda r: r.id in exempt_roles, msg.author.roles):
             return
         
