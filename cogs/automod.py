@@ -54,6 +54,7 @@ class Automod:
         # Waifu submissions
         if msg.channel.id in [467174606122516480]:
             if not msg.attachments and not self.linkregex.search(msg.content):
+                await msg.delete()
                 warnmsg = "Please post the image of the character you wish to submit."
                 try:
                     await msg.author.send(warnmsg)
