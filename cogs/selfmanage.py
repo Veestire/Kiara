@@ -77,12 +77,6 @@ class Selfmanage:
             for question, role in self.questions:
                 if await self.ask_question(member, question):
                     roles_to_add.append(discord.utils.get(guild.roles, id=role))
-            if await self.ask_question(member, "Are you currently in a relationship?"):
-                if await self.ask_question(member, "Would you like to display you're taken?"):
-                    roles_to_add.append(discord.utils.get(guild.roles, id=373135777955315712))
-            else:
-                if await self.ask_question(member, "Would you like to display you're single?"):
-                    roles_to_add.append(discord.utils.get(guild.roles, id=373135762230607882))
 
             if not await self.bot.redis.exists(f"claimedcolor:{member.id}"):
                 await member.send("As thanks for completing the intro, I'm going to give you a free role color!\n"
