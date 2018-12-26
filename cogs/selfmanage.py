@@ -4,14 +4,25 @@ import traceback
 import discord
 from discord.ext import commands
 
-from cogs.economy import base_colors
-
 def get_color_role(member):
     for role in member.roles:
         if role.color == member.color:
             return role
 
 GUILD_ID = 215424443005009920
+
+base_colors = [
+     ("Red", 424579184216506368, 30),
+     ("Yellow", 424579315066208276, 30),
+     ("Green", 424579385983762432, 30),
+     ("Orange", 424579446578872332, 30),
+     ("Cyan", 424579523363733507, 30),
+     ("Blue", 424579641802752000, 30),
+     ("Purple", 424579707573633024, 30),
+     ("Pink", 424579770240466951, 30),
+     ("Charcoal", 424579833994149888, 30),
+     ("Light Grey", 488187345565122565, 30),
+ ]
 
 class Selfmanage:
     """A cog for managing yourself"""
