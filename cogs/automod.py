@@ -51,7 +51,19 @@ class Automod:
         if msg.author.id == self.bot.user.id:
             return
 
-        # Ignore staff for everything
+        # Waifu submissions
+        if msg.channel.id in [467174606122516480]:
+            if not msg.attachments and not self.linkregex.search(msg.content):
+                warnmsg = "Please post the image of the character you wish to submit."
+                try:
+                    await msg.author.send(warnmsg)
+                except discord.Forbidden:
+                    await msg.channel.send(warnmsg, delete_after=6)
+            else:
+                for r in ['Yes:393865045005697034', 'No:393864998365167627']:
+                    await msg.add_reaction(r)
+
+        # Ignore staff for everything else
         if discord.utils.get(msg.author.roles, id=293008190843387911):
             return
 
