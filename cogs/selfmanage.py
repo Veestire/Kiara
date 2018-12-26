@@ -85,8 +85,8 @@ class Selfmanage:
                                   "Please tell me which one you'd like!\n"
                                   "Or... you can type `none` instead and I'll add 30 gold to your server balance!")
                 if await self.free_color(member) != False:
-                    await member.send("I've added this role to your inventory~ You can equip it by going to #terminal and typing `!shop`\n"
-                    "You can then `!buy` the color you chose for free! It won't cost you a thing~")
+                    await member.send("I've added this color to your inventory~\nYou can check your owned colors with "
+                                      "`!colors` and equip one with `!setcolor [color]`!")
 
         except asyncio.TimeoutError:
             try:
