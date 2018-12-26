@@ -93,6 +93,21 @@ class Automod:
                 if len(await self.moderation.get_recent_warns(msg.author.id)) >= 3:
                     await self.moderation.mute_user_id(msg.author.id, 60, "Auto mute")
 
+        # Message filter in waifu image channels
+        exempt_channels = [478166208219316224, 467174606122516480, 467174534794182657]  # faq, submissions, discussion
+        if msg.channel.category_id == 467658509224378388 and msg.channel.id not in exempt_channels:
+            if not msg.attachments and not self.linkregex.search(msg.content):
+                await msg.delete()
+                warnmsg = "Please refrain from talking in the waifu image channels, " \
+                          "you can leave any comments in <#467174534794182657>."
+                try:
+                    await msg.author.send(warnmsg)
+                except discord.Forbidden:
+                    await msg.channel.send(warnmsg, delete_after=6)
+                await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Talking in waifu image channels")
+                if len(await self.moderation.get_recent_warns(msg.author.id)) >= 3:
+                    await self.moderation.mute_user_id(msg.author.id, 60, "Auto mute")
+
         # Spam filter
         exempt_categories = [360699183851896833, 360707378275942400, 467658509224378388]  # Media, NSFW, Waifu
         if msg.channel.category_id in exempt_categories:
