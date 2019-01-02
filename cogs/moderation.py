@@ -423,15 +423,19 @@ class Moderation:
         await ctx.send(embed=em)
 
     @commands.command(aliases=['eventping'])
+    @commands.guild_only()
     @commands.has_role('Staff')
     async def toggleeventping(self, ctx):
-        await ctx.message.delete()
+        """Toggle mention permissions for the Event role, so you can ping it."""
         event_role = discord.utils.get(ctx.guild.roles, id=347689132908085248)
-        await event_role.edit(mentionable=True, reason="Making Event Pingable")
-        await ctx.send("Event ping mentionable till pinged", delete_after=2)
-        await self.bot.wait_for('message', check=lambda m: event_role in m.role_mentions)
-        await event_role.edit(mentionable=False, reason="Making Event Unpingable")
-        await ctx.send("Event ping no longer mentionable", delete_after=2)
+        await event_role.edit(mentionable=True, reason=f"{ctx.author}: Making @Event Pingable")
+        await ctx.send("Event ping mentionable till pinged, or 60 seconds pass")
+        try:
+            await self.bot.wait_for('message', check=lambda m: event_role in m.role_mentions, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("Role wasn't pinged for 60 seconds, so turning it off.")
+        await event_role.edit(mentionable=False, reason=f"{ctx.author}: Making @Event Unpingable")
+        await ctx.send("Event ping no longer mentionable")
 
     @commands.guild_only()
     @commands.command()
