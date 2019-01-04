@@ -437,6 +437,21 @@ class Moderation:
         await event_role.edit(mentionable=False, reason=f"{ctx.author}: Making @Event Unpingable")
         await ctx.send("Event ping no longer mentionable")
 
+    @commands.command(aliases=['tributeping'])
+    @commands.guild_only()
+    @commands.has_role('Staff')
+    async def toggletributeping(self, ctx):
+        """Toggle mention permissions for the Tribute role, so you can ping it."""
+        tribute_role = discord.utils.get(ctx.guild.roles, id=496940869774082048)
+        await tribute_role.edit(mentionable=True, reason=f"{ctx.author}: Making @Tributes Pingable")
+        await ctx.send("Tribute ping mentionable till pinged, or 60 seconds pass")
+        try:
+            await self.bot.wait_for('message', check=lambda m: tribute_role in m.role_mentions, timeout=60)
+        except asyncio.TimeoutError:
+            await ctx.send("Role wasn't pinged for 60 seconds, so turning it off.")
+        await tribute_role.edit(mentionable=False, reason=f"{ctx.author}: Making @Tributes Unpingable")
+        await ctx.send("Tribute ping no longer mentionable")
+
     @commands.guild_only()
     @commands.command()
     @commands.has_role('Staff')
