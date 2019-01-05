@@ -422,35 +422,24 @@ class Moderation:
 
         await ctx.send(embed=em)
 
-    @commands.command(aliases=['eventping'])
+    @commands.command(aliases=['roleping', 'enableping'])
     @commands.guild_only()
     @commands.has_role('Staff')
-    async def toggleeventping(self, ctx):
-        """Toggle mention permissions for the Event role, so you can ping it."""
-        event_role = discord.utils.get(ctx.guild.roles, id=347689132908085248)
-        await event_role.edit(mentionable=True, reason=f"{ctx.author}: Making @Event Pingable")
-        await ctx.send("Event ping mentionable till pinged, or 60 seconds pass")
-        try:
-            await self.bot.wait_for('message', check=lambda m: event_role in m.role_mentions, timeout=60)
-        except asyncio.TimeoutError:
-            await ctx.send("Role wasn't pinged for 60 seconds, so turning it off.")
-        await event_role.edit(mentionable=False, reason=f"{ctx.author}: Making @Event Unpingable")
-        await ctx.send("Event ping no longer mentionable")
+    async def toggleping(self, ctx, *, role: discord.Role):
+        ping_roles=[347689132908085248, 496940869774082048]
 
-    @commands.command(aliases=['tributeping'])
-    @commands.guild_only()
-    @commands.has_role('Staff')
-    async def toggletributeping(self, ctx):
-        """Toggle mention permissions for the Tribute role, so you can ping it."""
-        tribute_role = discord.utils.get(ctx.guild.roles, id=496940869774082048)
-        await tribute_role.edit(mentionable=True, reason=f"{ctx.author}: Making @Tributes Pingable")
-        await ctx.send("Tribute ping mentionable till pinged, or 60 seconds pass")
-        try:
-            await self.bot.wait_for('message', check=lambda m: tribute_role in m.role_mentions, timeout=60)
-        except asyncio.TimeoutError:
-            await ctx.send("Role wasn't pinged for 60 seconds, so turning it off.")
-        await tribute_role.edit(mentionable=False, reason=f"{ctx.author}: Making @Tributes Unpingable")
-        await ctx.send("Tribute ping no longer mentionable")
+        if role.id not in ping_roles:
+            await ctx.send("No role found to toggle. Either the role name was incorrect or you need to request this role to be added!")
+        else:
+            await role.edit(mentionable=True, reason=f"{ctx.author}: making @{role.name} Pingable")
+            await ctx.send(f"{role.name} ping mentionable till pinged, or 60 seconds pass")
+            try:
+                await self.bot.wait_for('message', check=lambda m: role in m.role_mentions, timeout=60)
+            except asyncio.TimeoutError:
+                await ctx.send("Role wasn't pinged for 60 seconds, so turing it off.")
+            await role.edit(mentionable=False, reason=f"{ctx.author}: Making @{role.name} Unpingable")
+            await ctx.send("Requested role no longer pingable.")
+
 
     @commands.guild_only()
     @commands.command()
