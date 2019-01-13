@@ -205,7 +205,7 @@ class Economy:
     async def get_buffs(self, user_id):
         for buff in self._active_buffs.setdefault(user_id, []):
             if buff.expires <= datetime.datetime.now():
-                await self.bot.db.execute('DELETE FROM active_buffs WHERE id=%s', (buff.id,))
+                await buff.remove()
             else:
                 yield buff
 
