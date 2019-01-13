@@ -245,7 +245,7 @@ class Economy:
             profile = await self.get_profile(user_id)
             yield profile
             if save:
-                await profile.save(self.bot.db)
+                await profile.save()
 
     def get_lock(self, name):
         lock = self._locks.get(name)
