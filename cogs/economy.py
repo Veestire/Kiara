@@ -141,22 +141,18 @@ class Buff:
 
 
 class Profile:
-    __slots__ = ('user_id', 'db', 'level', 'experience', 'fame', 'coins')
+    __slots__ = ('user_id', 'level', 'experience', 'fame', 'coins', '_economy', '_db')
 
-    def __init__(self, uid, **kwargs):
-        self.user_id = uid
-        self.db = kwargs.get('db', None)
+    def __init__(self, data, *, economy):
+        self._economy = economy
+        self._db = economy.bot.db
 
-        self.level = kwargs.get('level', 1)
-        self.experience = kwargs.get('experience', 0)
-        self.coins = kwargs.get('coins', 0)
+        for k in data:
+            setattr(self, k, data[k])
 
-    async def save(self, db=None):
-        db = self.db or db
-        if db:
-            s = ','.join(
-                [f'{s}={getattr(self,s,None)}' for s in self.__slots__[2:] if getattr(self, s, None) is not None])
-            await db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
+    async def save(self):
+        s = ','.join([f'{s}={getattr(self,s)}' for s in self.__slots__[1:-2] if getattr(self, s, None) is not None])
+        await self._db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
 
     async def has_item(self, name=None):
         pass
@@ -262,8 +258,8 @@ class Economy:
         profile = await self.bot.db.fetchdict(f'SELECT * FROM profiles WHERE user_id={uid}')
         if not profile:
             await self.bot.db.execute(f'INSERT INTO profiles (user_id) VALUES ("{uid}")')
-            return Profile(uid, level=0, experience=0, coins=0, db=self.bot.db)
-        return Profile(uid, **profile, db=self.bot.db)
+            return Profile({'user_id': uid, 'level': 0, 'experience': 0, 'coins': 0}, economy=self)
+        return Profile(profile, economy=self)
 
     async def on_message(self, msg):
         if not msg.guild:
