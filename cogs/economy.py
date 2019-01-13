@@ -268,8 +268,7 @@ class Economy:
             return
         if msg.author.bot:
             return
-        async with self.get_lock(msg.author.id):
-            profile = await self.get_profile(msg.author.id, ('level', 'experience', 'coins'))
+        async with self.transaction(msg.author.id) as profile:
 
             d = abs(msg.created_at - self.cooldowns.get(profile.user_id, datetime.datetime(2000, 1, 1)))
             if d < datetime.timedelta(seconds=5):
@@ -306,8 +305,6 @@ class Economy:
                         rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level - 5, 1)))
                         await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
-            await profile.save(self.bot.db)
-
         #
         buff = await self.bot.get_cog('Economy').get_buff(msg.author.id, 'kiara_test')
         if buff:
@@ -322,11 +319,9 @@ class Economy:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def givegold(self, ctx, member: discord.Member, gold: int):
-        async with self.get_lock(ctx.author.id):
-            profile = await self.get_profile(member.id, ['coins'])
+        async with self.transaction(ctx.author.id) as profile:
             profile.coins += gold
-            await profile.save(self.bot.db)
-            await ctx.send(f"{member} now has {profile.coins} gold")
+        await ctx.send(f"{member} now has {profile.coins} gold")
 
     @commands.command(hidden=True, aliases=['givecolour'])
     @commands.has_permissions(administrator=True)
@@ -340,22 +335,18 @@ class Economy:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def takegold(self, ctx, member: discord.Member, gold: int):
-        async with self.get_lock(ctx.author.id):
-            profile = await self.get_profile(member.id, ['coins'])
+        async with self.transaction(ctx.author.id) as profile:
             profile.coins -= gold
-            await profile.save(self.bot.db)
-            await ctx.send(f"{member} now has {profile.coins} gold")
+        await ctx.send(f"{member} now has {profile.coins} gold")
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def setlevel(self, ctx, member: discord.Member, level: int, xp: int = None):
-        async with self.get_lock(ctx.author.id):
-            profile = await self.get_profile(member.id, ['level'])
+        async with self.transaction(ctx.author.id) as profile:
             profile.level = level
             if xp:
                 profile.experience = xp
-            await profile.save(self.bot.db)
-            await ctx.send(f"{member} is now level {level}")
+        await ctx.send(f"{member} is now level {level}")
 
     @commands.command()
     async def profile(self, ctx):
