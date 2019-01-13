@@ -23,23 +23,6 @@ def exp_total(level):
     return sum([exp_needed(x) for x in range(level + 1)])
 
 
-def needs_profile(keys=None):
-    async def predicate(ctx):
-        if ctx.guild is None:
-            return False
-
-        if ctx.invoked_with.lower() == 'help':
-            return True
-
-        cog = ctx.bot.get_cog('Profiles')
-        async with ctx.typing():
-            ctx.profile = await cog.get_profile(ctx.author.id, keys)
-
-        return True
-
-    return commands.check(predicate)
-
-
 def levelup_gold(lvl):
     if lvl <= 5:
         amount = random.randint(1, 10)
