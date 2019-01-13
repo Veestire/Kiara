@@ -505,7 +505,7 @@ class Economy:
         emojis = ['❤', '💜', '🍉']
 
         # Fetch profile
-        profile = await self.profiles.get_profile(ctx.author.id)
+        profile = await self.get_profile(ctx.author.id)
 
         # Fetch data
         owned_colors = await self.get_owned_colors(ctx.author.id)
@@ -653,7 +653,7 @@ class Economy:
             return await ctx.send("This item isn't for sale at the moment.")
 
         # Handle transaction
-        async with self.profiles.transaction(ctx.author.id, save=False) as profile:
+        async with self.transaction(ctx.author.id, save=False) as profile:
             if profile.coins < item.cost:
                 return await ctx.send("You don't have enough gold")
             profile.coins -= item.cost
@@ -672,7 +672,7 @@ class Economy:
                 await ctx.send('Non color_role items not implemented')
 
     async def swap_member_color(self, member, role):
-        topcolor = self.profiles.get_top_color(member.roles)
+        topcolor = self.get_top_color(member.roles)
         if topcolor:
             await member.remove_roles(topcolor)
 
@@ -688,12 +688,12 @@ class Economy:
         if receiver and receiver.id == ctx.author.id:
             receiver = None
 
-        async with self.profiles.get_lock(ctx.author.id):
-            profile = await self.profiles.get_profile(ctx.author.id, ('coins', 'level'))
-            amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)) * self.profiles.gold_rate)
+        async with self.get_lock(ctx.author.id):
+            profile = await self.get_profile(ctx.author.id, ('coins', 'level'))
+            amount = int(random.randint(1, 5) * (1 + .2 * (profile.level//5)) * self.gold_rate)
             if receiver:
-                async with self.profiles.get_lock(receiver.id):
-                    profile2 = await self.profiles.get_profile(receiver.id, ('coins', 'level'))
+                async with self.get_lock(receiver.id):
+                    profile2 = await self.get_profile(receiver.id, ('coins', 'level'))
                     profile2.coins += amount
                     await profile2.save(self.bot.db)
             else:
@@ -733,7 +733,7 @@ class Economy:
             if not role:
                 return await ctx.send("This isn't a valid color")
             if role.id in owned:
-                topcolor = self.profiles.get_top_color(ctx.author.roles)
+                topcolor = self.get_top_color(ctx.author.roles)
                 if topcolor:
                     await ctx.author.remove_roles(topcolor)
                 await ctx.author.add_roles(role)
@@ -751,7 +751,7 @@ class Economy:
         if member is None:
             member = ctx.author
 
-        profile = await self.profiles.get_profile(member.id, ('coins',))
+        profile = await self.get_profile(member.id, ('coins',))
 
         await ctx.send(embed=discord.Embed(title=f"{member.display_name} has {profile.coins} gold"))
 
@@ -764,7 +764,7 @@ class Economy:
         if amount <= 0:
             return await ctx.send('Please provide an amount above 0.')
 
-        sender = await self.profiles.get_profile(ctx.author.id, ('coins',))
+        sender = await self.get_profile(ctx.author.id, ('coins',))
 
         if sender.coins < amount:
             return await ctx.send("You don't have enough gold to transfer that much.")
@@ -773,14 +773,14 @@ class Economy:
         response = await self.bot.wait_for('message', check=lambda m: m.author.id == ctx.author.id)
 
         if 'y' in response.content.lower():
-            async with self.profiles.get_lock(ctx.author.id):
-                sender = await self.profiles.get_profile(ctx.author.id, ('coins',))
+            async with self.get_lock(ctx.author.id):
+                sender = await self.get_profile(ctx.author.id, ('coins',))
                 if sender.coins < amount:
                     return await ctx.send("You somehow don't have the funds to do this anymore.")
                 sender.coins -= amount
                 await sender.save(self.bot.db)
-            async with self.profiles.get_lock(receiver.id):
-                taker = await self.profiles.get_profile(receiver.id, ('coins',))
+            async with self.get_lock(receiver.id):
+                taker = await self.get_profile(receiver.id, ('coins',))
                 taker.coins += amount
                 await taker.save(self.bot.db)
             await ctx.send(embed=discord.Embed(description=f"You sent {receiver} {amount}g."))
