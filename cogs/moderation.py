@@ -426,7 +426,7 @@ class Moderation:
     @commands.guild_only()
     @commands.has_role('Staff')
     async def toggleping(self, ctx, *, role: discord.Role):
-        ping_roles=[347689132908085248, 496940869774082048]
+        ping_roles=[347689132908085248, 533931119695888384]
 
         if role.id not in ping_roles:
             await ctx.send("No role found to toggle. Either the role name was incorrect or you need to request this role to be added!")
@@ -445,7 +445,7 @@ class Moderation:
     @commands.command()
     @commands.has_role('Staff')
     async def tribute(self, ctx, *, member: discord.Member):
-        tribute = discord.utils.get(ctx.guild.roles, id=496940869774082048)
+        tribute = discord.utils.get(ctx.guild.roles, id=533931119695888384)
         await member.add_roles(tribute)
         await ctx.send(f"User {member} now has the `tribute` role.")
 
