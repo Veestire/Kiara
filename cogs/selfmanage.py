@@ -46,7 +46,7 @@ class Selfmanage:
     def __init__(self, bot):
         self.bot = bot
         self.active_intros = []
-        self.profiles = bot.get_cog("Profiles")
+        self.profiles = bot.get_cog("Economy")
 
     async def on_member_join(self, member):
         if member.guild.id == GUILD_ID:
@@ -150,7 +150,7 @@ class Selfmanage:
             async with self.profiles.get_lock(user.id):
                 profile = await self.profiles.get_profile(user.id, ('coins',))
                 profile.coins += 30
-                await profile.save(self.bot.db)
+                await profile.save()
                 await self.bot.redis.set(f"claimedcolor:{user.id}", "gold")
                 await user.send("I've added 30 gold to your balance. Use `!shop` to go buy something~")
             return False
