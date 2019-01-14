@@ -16,7 +16,7 @@ class Raffle:
 
     def __init__(self, bot):
         self.bot = bot
-        self.profiles = bot.get_cog("Profiles")
+        self.profiles = bot.get_cog("Economy")
         self.raffle_channel = None
         self.alt_raffle_channel = None
         self.raffles = []
@@ -154,7 +154,7 @@ class Raffle:
             if profile.coins < int(cost):
                 return await user.send(f"Sorry, it costs {cost}g to enter for `{prize}`. You only have {profile.coins}g.")
             profile.coins -= int(cost)
-            await profile.save(self.bot.db)
+            await profile.save()
 
         await self.bot.redis.rpush(f'raffle_entries:{payload.message_id}', payload.user_id)
         await self.update_raffle(payload.message_id)
