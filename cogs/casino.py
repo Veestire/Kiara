@@ -101,7 +101,7 @@ class Casino:
             else:
                 await ctx.send(f"The coin landed on {win}. {emote}\nSorry, you lost {amount} gold")
                 profile.coins -= amount
-            await profile.save(self.bot.db)
+            await profile.save()
 
     @commands.command()
     async def russianroulette(self, ctx, *participants: discord.Member):
@@ -180,7 +180,7 @@ class Casino:
                                    f"The roulette landed on {hit} which is {hitcolor}! Sorry, you lose {amount} gold.")
                     profile.coins -= amount
 
-            await profile.save(self.bot.db)
+            await profile.save()
 
     @commands.command(enabled=False, aliases=['slots'])
     async def slotmachine(self, ctx, bet_per_line: int = 1, lines: int = 1):
