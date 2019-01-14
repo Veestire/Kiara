@@ -305,11 +305,6 @@ class Economy:
                         rem = discord.utils.get(msg.guild.roles, name=str(max(profile.level - 5, 1)))
                         await msg.author.remove_roles(rem, reason=f"Reached level {profile.level}")
 
-        #
-        buff = await self.bot.get_cog('Economy').get_buff(msg.author.id, 'kiara_test')
-        if buff:
-            await msg.add_reaction('❤')
-
     async def on_member_join(self, member):
         profile = await self.get_profile(member.id, ('level',))
         role = discord.utils.get(member.guild.roles, name=str(profile.level // 5 * 5))
