@@ -79,7 +79,7 @@ class Automod:
             await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Possible spam (Mentions)")
 
         # Message filter in NSFW channels
-        exempt_channels = [447050781544153089, 274230637538574337, 399017427897155604, 487134988031098881]  # comments, links, fiction, non-fiction
+        exempt_channels = [447050781544153089, 274230637538574337, 399017427897155604, 487134988031098881, 534240765526933514]  # comments, links, fiction, non-fiction, sauce
         if msg.channel.category_id == 360707378275942400 and msg.channel.id not in exempt_channels:
             if not msg.attachments and not self.linkregex.search(msg.content):
                 await msg.delete()
