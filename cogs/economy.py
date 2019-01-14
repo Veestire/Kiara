@@ -681,10 +681,10 @@ class Economy:
                 async with self.get_lock(receiver.id):
                     profile2 = await self.get_profile(receiver.id, ('coins', 'level'))
                     profile2.coins += amount
-                    await profile2.save(self.bot.db)
+                    await profile2.save()
             else:
                 profile.coins += amount
-                await profile.save(self.bot.db)
+                await profile.save()
 
         if receiver:
             await ctx.send(f"You gave <@{receiver.id}> {amount} gold as daily reward.")
