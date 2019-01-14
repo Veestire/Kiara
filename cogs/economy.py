@@ -791,18 +791,6 @@ class Economy:
         user = user or ctx.author
         await ctx.send(', '.join([buff.name async for buff in self.get_buffs(user.id)] or ['None']))
 
-    @commands.command()
-    async def bufftest(self, ctx):
-        await self.give_buff(ctx.author.id, 'kiara_test', 60)
-
-    @commands.command()
-    async def buffconsume(self, ctx):
-        buff = await self.get_buff(ctx.author.id, 'kiara_test')
-        if buff:
-            await buff.remove()
-            return await ctx.send("kiara_test buff consumed")
-        else:
-            return await ctx.send("not buffed")
 
 def setup(bot):
     bot.add_cog(Economy(bot))
