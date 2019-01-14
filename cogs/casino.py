@@ -72,7 +72,7 @@ class Casino:
 
     def __init__(self, bot):
         self.bot = bot
-        self.profiles = bot.get_cog("Profiles")
+        self.profiles = bot.get_cog("Economy")
 
     @commands.command(aliases=['cf'])
     async def coinflip(self, ctx, amount: int, choice=None):
