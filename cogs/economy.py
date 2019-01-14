@@ -150,7 +150,7 @@ class Profile:
         for k in data:
             setattr(self, k, data[k])
 
-    async def save(self):
+    async def save(self, db=None):
         s = ','.join([f'{s}={getattr(self,s)}' for s in self.__slots__[1:-2] if getattr(self, s, None) is not None])
         await self._db.execute(f"UPDATE profiles SET {s} WHERE user_id={self.user_id}")
 
