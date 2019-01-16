@@ -129,6 +129,12 @@ class Automod:
         if member.created_at > datetime.datetime.now() - datetime.timedelta(days=1):
             await member.send("Your account has been kicked for being under a day old to prevent malicious users joining the server.")
             await member.kick(reason="Auto-kick for suspicious account")
+            return
+
+        # Mute re-joining users that are supposed to be muted
+        qry = 'SELECT expires FROM timers WHERE event="unmute" AND json_extract(data, "$[1]") = %s'
+        if await self.bot.db.fetchone(qry, (member.id,)):
+            await member.add_roles(discord.utils.get(member.guild.roles, id=348331525479071745), reason="Re-join mute")
 
 
 def setup(bot):
