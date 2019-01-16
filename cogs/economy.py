@@ -314,7 +314,7 @@ class Economy:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def givegold(self, ctx, member: discord.Member, gold: int):
-        async with self.transaction(ctx.author.id) as profile:
+        async with self.transaction(member.id) as profile:
             profile.coins += gold
         await ctx.send(f"{member} now has {profile.coins} gold")
 
@@ -330,14 +330,14 @@ class Economy:
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def takegold(self, ctx, member: discord.Member, gold: int):
-        async with self.transaction(ctx.author.id) as profile:
+        async with self.transaction(member.id) as profile:
             profile.coins -= gold
         await ctx.send(f"{member} now has {profile.coins} gold")
 
     @commands.command(hidden=True)
     @commands.has_permissions(administrator=True)
     async def setlevel(self, ctx, member: discord.Member, level: int, xp: int = None):
-        async with self.transaction(ctx.author.id) as profile:
+        async with self.transaction(member.id) as profile:
             profile.level = level
             if xp:
                 profile.experience = xp
