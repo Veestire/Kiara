@@ -36,7 +36,7 @@ class CleverWrap:
         async with aiohttp.ClientSession() as sess:
             async with sess.get(self.url, params=params) as resp:
                 if resp.status == 200:
-                    res = await resp.json()
+                    res = await resp.json(encoding='latin-1')
                     # print(res)
                     return res
 
