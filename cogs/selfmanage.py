@@ -83,26 +83,29 @@ class Selfmanage:
         fresh = discord.utils.get(member.roles, id=373122164544765953) is None
 
         try:
-            await self.bot.wait_for('message',
-                                    check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
+            await self.bot.wait_for('message', check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
             for question, role in self.questions:
                 if await self.ask_question(member, question):
                     roles_to_add.append(discord.utils.get(guild.roles, id=role))
 
+            # If the user hasn't claimed a free color
             if not await self.bot.redis.exists(f"claimedcolor:{member.id}"):
-                await member.send("As thanks for completing the intro, I'm going to give you a free role color!\n"
-                                  "These colors are the following:\n"
-                                  f"{', '.join([i[0] for i in base_colors])}\n"
-                                  "Please tell me which one you'd like!\n"
-                                  "Or... you can type `none` instead and I'll add 30 gold to your server balance!")
-                if await self.free_color(member) != False:
-                    await member.send("I've added this color to your inventory~\nYou can check your owned colors with "
-                                      "`!colors` and equip one with `!setcolor [color]`!")
-
+                if await self.ask_question(member, 'Would you like a colored name for on the server?'):
+                    owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={member.id}')]
+                    await member.send("Which of the following colors would you like?\n"
+                                      f"{', '.join([i[0] for i in base_colors])} or `none`")
+                    c = await self.bot.wait_for('message', check=lambda m: m.author.id == member.id and m.guild is None,
+                                                timeout=120)
+                    for name, color_code, price in base_colors:
+                        if c.content.lower() == name.lower() and color_code not in owned:
+                            await self.bot.db.execute(f"INSERT INTO colors (user_id, color) VALUES ({member.id}, {color_code})")
+                            await self.bot.redis.set(f"claimedcolor:{member.id}", f"{name}")
+                            roles_to_add.append(discord.utils.get(guild.roles, id=color_code))
+                            break
         except asyncio.TimeoutError:
             try:
                 await member.send('Sorry, you took too long to answer. Use `~intro` if you want to start over.')
-            except:
+            except discord.errors.Forbidden:
                 pass
             self.active_intros.remove(member.id)
         else:
@@ -119,7 +122,6 @@ class Selfmanage:
                 traceback.print_tb(e.__traceback__)
             self.active_intros.remove(member.id)
 
-
     async def ask_question(self, user, question):
         def check(m):
             return isinstance(m.channel, discord.DMChannel) and m.author == user and is_answer(m.content)
@@ -134,25 +136,6 @@ class Selfmanage:
             await m.add_reaction('✅')
             return True
         else:
-            return False
-
-    async def free_color(self, user):
-        owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user.id}')]
-        c = await self.bot.wait_for('message', check=lambda m:m.author == user and m.guild is None,
-        timeout=120)
-        for name, color_code, price in base_colors:
-            if (c.content.lower() == name.lower()) and color_code not in owned:
-                await self.bot.db.execute(f"INSERT INTO colors (user_id, color) VALUES ({user.id}, {color_code})")
-                await self.bot.redis.set(f"claimedcolor:{user.id}", f"{name}")
-                break
-
-        else:
-            async with self.profiles.get_lock(user.id):
-                profile = await self.profiles.get_profile(user.id, ('coins',))
-                profile.coins += 30
-                await profile.save()
-                await self.bot.redis.set(f"claimedcolor:{user.id}", "gold")
-                await user.send("I've added 30 gold to your balance. Use `!shop` to go buy something~")
             return False
 
 
