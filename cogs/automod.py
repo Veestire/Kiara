@@ -64,6 +64,11 @@ class Automod:
                 for r in ['Yes:393865045005697034', 'No:393864998365167627']:
                     await msg.add_reaction(r)
 
+        # Tributes
+        if msg.channel.id == 529036544435027969:
+            if discord.utils.get(msg.author.roles, name="Tributes") is None:
+                await msg.author.add_roles(discord.utils.get(msg.guild.roles, name="Tributes"))
+
         # Ignore staff for everything else
         if discord.utils.get(msg.author.roles, id=293008190843387911):
             return
