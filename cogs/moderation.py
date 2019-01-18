@@ -440,15 +440,6 @@ class Moderation:
             await role.edit(mentionable=False, reason=f"{ctx.author}: Making @{role.name} Unpingable")
             await ctx.send("Requested role no longer pingable.")
 
-
-    @commands.guild_only()
-    @commands.command()
-    @commands.has_role('Staff')
-    async def tribute(self, ctx, *, member: discord.Member):
-        tribute = discord.utils.get(ctx.guild.roles, id=533931119695888384)
-        await member.add_roles(tribute)
-        await ctx.send(f"User {member} now has the `tribute` role.")
-
     @commands.command()
     @commands.guild_only()
     @commands.has_role('Staff')
