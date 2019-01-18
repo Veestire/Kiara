@@ -4,6 +4,9 @@ import traceback
 import discord
 from discord.ext import commands
 
+from cogs.utils.cooldowns import basic_cooldown
+
+
 def get_color_role(member):
     for role in member.roles:
         if role.color == member.color:
@@ -137,6 +140,30 @@ class Selfmanage:
             return True
         else:
             return False
+
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    @basic_cooldown(60)
+    async def tribute(self, ctx):
+        rolename = "Tributes"
+        if discord.utils.get(ctx.author.roles, name=rolename) is None:
+            await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I gave you the {rolename} role.')
+        else:
+            await ctx.author.remove_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I removed your {rolename} role.')
+
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    @basic_cooldown(60)
+    async def pokemon(self, ctx):
+        rolename = "Pokemon"
+        if discord.utils.get(ctx.author.roles, name=rolename) is None:
+            await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I gave you the {rolename} role.')
+        else:
+            await ctx.author.remove_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I removed your {rolename} role.')
 
 
 def setup(bot):
