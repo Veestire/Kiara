@@ -11,12 +11,12 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class Christmas:
-    """Merry christmas"""
+class Drops:
+    """Random lewd care packages"""
 
     def __init__(self, bot):
         self.bot = bot
-        self.profiles = self.bot.get_cog('Profiles')
+        self.economy = self.bot.get_cog('Economy')
         self.bg_task = bot.loop.create_task(self.drop_present_task())
 
     def __unload(self):
@@ -26,7 +26,7 @@ class Christmas:
         await self.bot.wait_until_ready()
         try:
             while not self.bot.is_closed():
-                if random.random() <= 0.03:
+                if random.random() <= 0.015:
                     await self.drop_present()
                 await asyncio.sleep(60)
         except Exception as e:
@@ -35,13 +35,13 @@ class Christmas:
     async def drop_present(self, channel=None):
         ch = self.bot.get_channel(channel or 215424443005009920)
 
-        emb = discord.Embed(color=discord.Color(0x09c500))
-        emb.add_field(name='<:pr:514142499397173248> A big present has fallen from a sleigh high above.',
-                      value="Claim your share by reacting before Santa comes down to take it back!")
+        emb = discord.Embed(color=discord.Color(0xFFA4C4))
+        emb.add_field(name='💖 A lewd care package has dropped.',
+                      value="React with 💖 to claim your share.")
         msg = await ch.send(embed=emb)
-        await msg.add_reaction('pr:514142498415706123')
+        await msg.add_reaction('💖')
 
-        end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(8, 20))
+        end_time = datetime.datetime.now() + datetime.timedelta(seconds=random.randint(10, 30))
 
         claimed = []
 
@@ -58,54 +58,34 @@ class Christmas:
 
         if claimed:
             share = ' and '.join(', '.join([f'<@{uid}>' for uid in claimed]).rsplit(', ', 1))
-
-            emb = discord.Embed(color=discord.Color(0x09c500))
-            emb.add_field(name=f'<:pr:514142498415706123> The present has been reclaimed.', value=f'{share} took a share for themselves.')
+            emb = discord.Embed(color=discord.Color(0xFFA4C4))
+            emb.add_field(name=f'The care package has been emptied out.', value=f'{share} took their share.')
             await ch.send(embed=emb)
         else:
-            emb = discord.Embed(color=discord.Color(0x09c500), title="Santa reclaimed the present before anyone could take a look inside.")
+            emb = discord.Embed(color=discord.Color(0xFFA4C4), title="The care package despawned before anyone could take a share..")
             await ch.send(embed=emb)
             return
 
         for user_id in claimed:
             try:
                 user = self.bot.get_user(user_id)
-                if not user:
+                if user is None:
                     continue
-                rand = random.random()
-                if rand < .75:  # Daily
-                    async with self.profiles.get_lock(user_id):
-                        profile = await self.profiles.get_profile(user_id, ('coins',))
-                        amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.profiles.gold_rate)
 
-                        if rand < .25:  # Double daily
+                rand = random.random()
+                if rand < .90:  # Half daily
+                    async with self.economy.transaction(user_id) as profile:
+                        amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.economy.gold_rate)
+
+                        if rand < .25:  # Double
                             amount *= 2
                         profile.coins += amount
-                        await profile.save(self.bot.db)
                     await user.send(f"Your share contained {amount} gold!")
-                elif rand < .85:  # 50-100 gold
-                    async with self.profiles.get_lock(user_id):
-                        profile = await self.profiles.get_profile(user_id, ('coins',))
-                        amount = random.randint(25, 50)
+                else:  # 12-25 gold
+                    async with self.economy.transaction(user_id) as profile:
+                        amount = random.randint(12, 25)
                         profile.coins += amount
-                        await profile.save(self.bot.db)
                     await user.send(f"Your share contained {amount} gold!")
-                else:  # Random christmas color role
-                    role_id, name = random.choice([(515821706535895050, 'Festive Fir'), (515822501037867009, 'Snowglobe'),
-                                                  (515071275408949280, 'Christmas Spirit')])
-                    owned = [r[0] for r in await self.bot.db.fetch(f'SELECT color FROM colors WHERE user_id={user_id}')]
-
-                    if role_id in owned:
-                        async with self.profiles.get_lock(user_id):
-                            profile = await self.profiles.get_profile(user_id, ('coins',))
-                            amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.profiles.gold_rate)
-                            profile.coins += amount
-                            await profile.save(self.bot.db)
-                        await user.send(f"Your share contained {amount} gold!")
-                    else:
-                        await self.bot.db.execute(f'INSERT INTO colors (user_id, color) VALUES ({user_id}, {role_id})')
-                        await user.send(f"Your share contained the '{name}' role!\n"
-                                        "It has been added to your color inventory.")
             except Exception as e:
                 print(f'Fucksywucksy', file=sys.stderr)
                 print(e, file=sys.stderr)
@@ -116,4 +96,4 @@ class Christmas:
         await self.drop_present(channel)
 
 def setup(bot):
-    bot.add_cog(Christmas(bot))
+    bot.add_cog(Drops(bot))
