@@ -7,6 +7,14 @@ from discord.ext import commands
 GUILD_ID = 215424443005009920
 LOG_CHANNEL = 364983647087886336
 
+async def poll_audit_log(guild, action, after, *, poll=1, **kwargs):
+    for i in range(poll):
+        log = await guild.audit_logs(action=action, after=after).get(**kwargs)
+        if log:
+            return log
+        await asyncio.sleep(1)
+    return None
+
 class Stafflog:
     """Logging the bans~"""
 
@@ -54,8 +62,9 @@ class Stafflog:
     async def on_member_ban(self, guild, member):
         if guild.id != GUILD_ID:
             return
-        await asyncio.sleep(2)
-        log = await guild.audit_logs(action=discord.AuditLogAction.ban).get(target__id=member.id)
+        
+        time = datetime.datetime.utcnow() - datetime.timedelta(seconds=1)
+        log = await poll_audit_log(guild, discord.AuditLogAction.ban, time, poll=5, target__id=member.id)
         if log:
             await self.make_case(member, 'Ban', log.reason, log.user)
 
