@@ -21,7 +21,7 @@ class Wordfilter:
         # if any(word in sentence for word in self.words):
         #     return True
         for word in self.words:
-            if word in sentence.split():
+            if word in sentence.lower().split():
                 return word
         return False
 
@@ -34,6 +34,7 @@ class Wordfilter:
     @wordfilter.command(name='add')
     async def wordfilter_add(self, ctx, *, phrase):
         """Add a word to the word filter"""
+        phrase = phrase.lower()
         await self.bot.redis.rpush('wordfilter', phrase)
         self.words.append(phrase)
         await ctx.send(f'Added `{phrase}` to the filtered words')
@@ -41,6 +42,7 @@ class Wordfilter:
     @wordfilter.command(name='remove')
     async def wordfilter_remove(self, ctx, *, phrase):
         """Remove a word from the word filter"""
+        phrase = phrase.lower()
         await self.bot.redis.lrem('wordfilter', 0, phrase)
         self.words.remove(phrase)
         await ctx.send(f'Removed `{phrase}` from the filtered words')
@@ -74,8 +76,9 @@ class Wordfilter:
         found = self.test_sentence(msg.content)
 
         if found:
+            await msg.delete()
             await self.moderation.mute_user_id(msg.author.id, 10, "Auto mute")
-            await self.moderation.warn_user(msg.author.id, self.bot.user.id, "Auto-mute: Triggered the word filter (`{found}`)")
+            await self.moderation.warn_user(msg.author.id, self.bot.user.id, f"Auto-mute: Triggered the word filter (`{found}`)")
 
     async def on_message_edit(self, before, after):
         if not after.guild:
@@ -92,8 +95,9 @@ class Wordfilter:
         found = self.test_sentence(after.content)
 
         if found:
+            await after.delete()
             await self.moderation.mute_user_id(after.author.id, 10, "Auto mute")
-            await self.moderation.warn_user(after.author.id, self.bot.user.id, "Auto-mute: Triggered the word filter (`{found}`)")
+            await self.moderation.warn_user(after.author.id, self.bot.user.id, f"Auto-mute: Triggered the word filter (`{found}`)")
 
 def setup(bot):
     bot.add_cog(Wordfilter(bot))
