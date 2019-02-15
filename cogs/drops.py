@@ -26,7 +26,7 @@ class Drops:
         await self.bot.wait_until_ready()
         try:
             while not self.bot.is_closed():
-                if random.random() <= 0.3:
+                if random.random() <= 0.03:
                     await self.drop_present()
                 await asyncio.sleep(60)
         except Exception as e:
