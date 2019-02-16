@@ -26,7 +26,7 @@ class Drops:
         await self.bot.wait_until_ready()
         try:
             while not self.bot.is_closed():
-                if random.random() <= 0.03:
+                if random.random() <= 0.015:
                     await self.drop_present()
                 await asyncio.sleep(60)
         except Exception as e:
@@ -73,17 +73,8 @@ class Drops:
                     continue
 
                 rand = random.random()
-                if not await self.bot.redis.exists(f"valentines_rose:{user.id}"):
-                    await user.send(f'''Dear {user.mention},\n
 
-You're really cute. Be my Valentine. I'll bribe you with this cute "Valentines Rose" color you now have in your Waifu Worshipping color inventory!\n
-
-Love, Kiara <3
-                    ''')
-                    await self.bot.redis.set(f"valentines_rose:{user.id}", "claimed")
-                    await self.bot.db.execute(f"INSERT INTO colors (user_id, color) VALUES ({user.id}, '409524603426308096')")
-
-                elif rand < .90:  # Half daily
+                if rand < .90:  # Half daily
                     async with self.economy.transaction(user_id) as profile:
                         amount = int(random.randint(1, 3) * (1 + .2 * (profile.level // 5)) * self.economy.gold_rate)
 
