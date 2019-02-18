@@ -21,7 +21,7 @@ class Wordfilter:
         # if any(word in sentence for word in self.words):
         #     return True
         for word in self.words:
-            if word in sentence.lower().split():
+            if word in sentence.lower():
                 return word
         return False
 
