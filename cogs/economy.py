@@ -353,6 +353,8 @@ class Economy:
         if ctx.guild:
             if member.id == 73389450113069056:
                 member.joined_at = ctx.guild.created_at
+            if member.id == 129034173305454593:
+                member.joined_at = datetime.datetime(2017, 9, 3, 8, 48)
             e.add_field(name=f'Joined', value=time.time_ago(member.joined_at), inline=True)
             e.add_field(name=f'Nickname', value=member.nick or "None", inline=False)
             e.add_field(name=f'Roles', value=' '.join([role.mention for role in member.roles[:0:-1]]), inline=False)

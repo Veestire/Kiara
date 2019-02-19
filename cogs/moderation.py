@@ -234,6 +234,8 @@ class Moderation:
 
         if member.id == 73389450113069056:
             member.joined_at = ctx.guild.created_at
+        if member.id == 129034173305454593:
+            member.joined_at = datetime.datetime(2017, 9, 3, 8, 48)
 
         e = discord.Embed(title=f'{member} (ID: {member.id})', colour=discord.Colour.green())
         e.set_thumbnail(url=member.avatar_url_as(size=128))
