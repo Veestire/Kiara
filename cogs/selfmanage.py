@@ -141,7 +141,7 @@ class Selfmanage:
         else:
             return False
 
-    @commands.command(hidden=True)
+    @commands.command(aliases=['tributes'], hidden=True)
     @commands.guild_only()
     @basic_cooldown(60)
     async def tribute(self, ctx):
