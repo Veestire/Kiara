@@ -169,7 +169,7 @@ class Selfmanage:
     @commands.command(hidden=True)
     @commands.guild_only()
     @basic_cooldown(60)
-    async def wafiu(self, ctx):
+    async def waifu(self, ctx):
         rolename = "Waifu"
         if discord.utils.get(ctx.author.roles, name=rolename) is None:
             await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=rolename))
