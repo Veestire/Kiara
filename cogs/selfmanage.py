@@ -32,7 +32,7 @@ class Selfmanage:
 
     all_roles = [
         353019520983629824, 347689132908085248, 371251751564869632,
-        373135777955315712, 373135762230607882, 389376686745059329
+        389376686745059329
     ]
     legal = "Welcome to Waifu Worshipping, the home of all your lewd socialising needs! " \
             "Please make sure to read over #information and #rules to learn the essentials.\n" \
