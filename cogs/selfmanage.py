@@ -32,7 +32,7 @@ class Selfmanage:
 
     all_roles = [
         353019520983629824, 347689132908085248, 371251751564869632,
-        389376686745059329
+        389376686745059329, 549542288020471808
     ]
     legal = "Welcome to Waifu Worshipping, the home of all your lewd socialising needs! " \
             "Please make sure to read over #information and #rules to learn the essentials.\n" \
@@ -43,7 +43,8 @@ class Selfmanage:
         ('Are you happy to receive messages from other users in the server?', 353019520983629824),
         ('Are you interested in being informed about all future server-wide events? (Movie nights, gaming events, and other fun activities)', 347689132908085248),
         ('Are you interested in seeing NSFW content?', 371251751564869632),
-        ('Are you interested in roleplay channels?', 389376686745059329)
+        ('Are you interested in roleplay channels?', 389376686745059329),
+        ("Are you interested in the 'Weekly Waifu' channels? These are channels dedicated to posting images of the chosen waifu of the week, who is used for the server icon.", 549542288020471808)
     ]
 
     def __init__(self, bot):
@@ -165,6 +166,17 @@ class Selfmanage:
             await ctx.author.remove_roles(discord.utils.get(ctx.guild.roles, name=rolename))
             await ctx.send(f'I removed your {rolename} role.')
 
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    @basic_cooldown(60)
+    async def waifu(self, ctx):
+        rolename = "Waifu"
+        if discord.utils.get(ctx.author.roles, name=rolename) is None:
+            await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I gave you the {rolename} role.')
+        else:
+            await ctx.author.remove_roles(discord.utils.get(ctx.guild.roles, name=rolename))
+            await ctx.send(f'I removed your {rolename} role.')
 
 def setup(bot):
     bot.add_cog(Selfmanage(bot))
