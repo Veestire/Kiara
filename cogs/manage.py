@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
 
-class Manage:
+
+class Manage(commands.Cog):
     """Commands for managing Kiara as user"""
 
     def __init__(self, bot):
         self.bot = bot
 
-    async def __local_check(self, ctx):
+    async def cog_check(self, ctx):
         return ctx.author.id in [73389450113069056, 211238461682876416]
 
     @commands.group(hidden=True, aliases=['set', 'mng'])
