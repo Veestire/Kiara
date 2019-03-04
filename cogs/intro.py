@@ -46,12 +46,16 @@ class Intro(commands.Cog):
 
     @commands.command()
     async def newintro(self, ctx):
+        if ctx.author.id in self.active_intros:
+            return await ctx.send("You're already doing the intro.")
+        if ctx.guild:
+            await ctx.send(f'{ctx.author.mention} I sent you a DM!')
         await self.run_intro(ctx.author)
 
     @commands.command()
     @commands.has_role('Staff')
-    async def activeintros(self):
-        pass
+    async def activeintros(self, ctx):
+        await ctx.send(', '.join(self.active_intros) if self.active_intros else "None")
 
     # @commands.Cog.listener()
     # async def on_member_join(self, member):
@@ -66,6 +70,8 @@ class Intro(commands.Cog):
     #             await self.run_intro(member)
 
     async def run_intro(self, member):
+        if member.id in self.active_intros:
+            return
         guild = self.bot.get_guild(self.bot.config.guild_id)
 
         if not isinstance(member, discord.Member):
@@ -87,6 +93,7 @@ class Intro(commands.Cog):
         # The actual intro
         roles_to_add = []
         try:
+            await member.send(self.legal)
             await self.bot.wait_for('message', check=lambda m: m.content.lower() == 'begin' and m.author == member, timeout=300)
 
             for question, role_id in self.questions:
