@@ -61,8 +61,7 @@ class Automod:
                 except discord.Forbidden:
                     await msg.channel.send(warnmsg, delete_after=6)
             else:
-                for r in ['Yes:393865045005697034', 'No:393864998365167627']:
-                    await msg.add_reaction(r)
+                await msg.add_reaction('Yes:393865045005697034')
 
         # Tributes
         if msg.channel.id == 529036544435027969:
