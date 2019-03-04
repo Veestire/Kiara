@@ -12,3 +12,6 @@ class Context(commands.Context):
     @property
     def redis(self):
         return self.bot.redis
+
+    async def confirm(self):
+        await self.message.add_reaction('greentick:526847326812110933')
