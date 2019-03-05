@@ -19,7 +19,7 @@ class Drops(commands.Cog):
         self.economy = self.bot.get_cog('Economy')
         self.bg_task = bot.loop.create_task(self.drop_present_task())
 
-    def __unload(self):
+    def cog_unload(self):
         self.bg_task.cancel()
 
     async def drop_present_task(self):

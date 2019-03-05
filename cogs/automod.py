@@ -21,7 +21,7 @@ class Automod(commands.Cog):
 
         self.bg_task = bot.loop.create_task(self.update_user_log())
 
-    def __unload(self):
+    def cog_unload(self):
         self.bg_task.cancel()
 
     async def update_user_log(self):

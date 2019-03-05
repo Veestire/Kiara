@@ -37,7 +37,7 @@ class Timers(commands.Cog):
         self._current_timer = None
         self._task = bot.loop.create_task(self.remind_check_loop())
 
-    def __unload(self):
+    def cog_unload(self):
         self._task.cancel()
 
     async def remind_check_loop(self):

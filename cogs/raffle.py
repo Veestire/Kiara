@@ -22,7 +22,7 @@ class Raffle(commands.Cog):
         self.raffles = []
         self.bg_task = bot.loop.create_task(self.raffle_interval())
 
-    def __unload(self):
+    def cog_unload(self):
         self.bg_task.cancel()
 
     async def raffle_interval(self):
