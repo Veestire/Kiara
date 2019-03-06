@@ -408,7 +408,7 @@ class Moderation(commands.Cog):
         A warning is considered "recent" if it hasn't been at least 30 days since the warning.
         """
         await self.warn_user(member.id, ctx.author.id, reason)
-        await ctx.message.add_reaction('Yes:393865045005697034')
+        await ctx.send(f'Warned {member} for "{reason}"')
 
     @commands.command()
     @commands.has_role('Staff')
